@@ -1,0 +1,8 @@
+datasets
+huggingface_hub
+pandas
+matplotlib
+seaborn
+scikit-learn
+pypdf
+tqdm
