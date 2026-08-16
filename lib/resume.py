@@ -3,7 +3,6 @@ import json
 import re
 import warnings
 import os
-import csv
 
 # Add current directory to path so we can import skill_ontology
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -314,30 +313,6 @@ def extract_resume(filepath):
     # Add system fields
     profile["filename"] = filepath.split("/")[-1].split("\\")[-1]
     profile["raw_text_snippet"] = cleaned_text[:3000] # Provide extensive raw text for Groq validation
-    
-    # Save to CSV Database for Streamlit App
-    csv_path = os.path.join("data", "extracted_resumes.csv")
-    file_exists = os.path.exists(csv_path)
-    
-    try:
-        with open(csv_path, 'a', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            if not file_exists:
-                writer.writerow(['Filename', 'Category', 'Confidence', 'Skills', 'Experience', 'RawText'])
-                
-            skills_str = ", ".join([s.get("name", "") for s in profile["skills"]])
-            exp_str = " | ".join([f"{e.get('job_title', '')} at {e.get('company', '')}" for e in profile["experience"]])
-            
-            writer.writerow([
-                profile["filename"],
-                profile["career_signal"]["dataset_category"],
-                profile["career_signal"]["confidence"],
-                skills_str,
-                exp_str,
-                profile["raw_text_snippet"]
-            ])
-    except Exception as e:
-        print(f"Warning: Failed to save to CSV - {e}")
 
     return profile
 
