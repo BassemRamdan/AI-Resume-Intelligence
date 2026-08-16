@@ -47,10 +47,9 @@ def calculate_similarity(profile_data):
         score = util.cos_sim(emb, proto_tensor)[0][0].item()
         cat_results.append({"category": cat, "similarity": score})
         
-    max_s = max(r['similarity'] for r in cat_results)
-    min_s = min(r['similarity'] for r in cat_results)
     for r in cat_results:
-        r['score'] = round(((r['similarity'] - min_s) / (max_s - min_s + 1e-9)) * 100, 1)
+        # Direct mapping (cosine similarity * 100) instead of min-max scaling
+        r['score'] = round(max(0, r['similarity']) * 100, 1)
     cat_results = sorted(cat_results, key=lambda x: x['score'], reverse=True)
     
     # 2. KNN Similar CVs

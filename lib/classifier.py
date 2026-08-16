@@ -18,10 +18,12 @@ def classify_text(text):
         with torch.no_grad():
             outputs = classifier(**inputs)
             logits = outputs.logits
+            probs = torch.nn.functional.softmax(logits, dim=-1)
+            confidence = torch.max(probs).item()
             predicted_idx = torch.argmax(logits, dim=-1).item()
             
         predicted_category = classifier.config.id2label.get(predicted_idx, "UNKNOWN_CATEGORY")
-        confidence = 0.9
+        confidence = round(confidence, 4)
     except Exception as e:
         print(f"Classification Error: {e}")
         pass
