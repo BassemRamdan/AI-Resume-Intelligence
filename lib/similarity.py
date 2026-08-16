@@ -80,15 +80,25 @@ def calculate_similarity(profile_data):
         })
 
     # Pre-process profile data for the Career Fit engine
-    prof_skills = [normalize_text(s.get("name", "")) for s in profile.get("skills", [])]
-    prof_projects = []
-    for p in profile.get("projects", []):
-        text = normalize_text(p.get("title", "")) + " " + normalize_text(p.get("description", ""))
-        techs = [normalize_text(t) for t in p.get("technologies", [])]
-        prof_projects.append({"text": text, "techs": techs})
+    prof_skills = []
+    for s in profile.get("skills") or []:
+        prof_skills.append(normalize_text(s.get("name", "")))
         
-    prof_edu = " ".join([normalize_text(e.get("degree", "")) + " " + normalize_text(e.get("field", "")) for e in profile.get("education", [])])
-    prof_exp = " ".join([normalize_text(e.get("job_title", "")) + " " + normalize_text(e.get("responsibilities", "")) for e in profile.get("experience", [])])
+    prof_projects = []
+    for p in profile.get("projects") or []:
+        title_desc = normalize_text(p.get("title", p.get("name", ""))) + " " + normalize_text(p.get("description", ""))
+        techs = [normalize_text(t) for t in (p.get("technologies") or [])]
+        prof_projects.append({"text": title_desc, "techs": techs})
+        
+    prof_edu_list = []
+    for e in profile.get("education") or []:
+        prof_edu_list.append(normalize_text(e.get("degree", "")) + " " + normalize_text(e.get("field", "")))
+    prof_edu = " ".join(prof_edu_list)
+    
+    prof_exp_list = []
+    for e in profile.get("experience") or []:
+        prof_exp_list.append(normalize_text(e.get("job_title", "")) + " " + normalize_text(e.get("responsibilities", "")))
+    prof_exp = " ".join(prof_exp_list)
 
     # 2. Career Fit Engine (Deterministic Multi-Signal)
     career_fit_results = []
