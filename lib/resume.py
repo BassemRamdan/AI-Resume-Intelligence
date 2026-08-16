@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore")
 
 try:
     from pypdf import PdfReader
-    import fitz # PyMuPDF for Computer Vision layout analysis
+    import pymupdf as fitz # PyMuPDF for Computer Vision layout analysis
     import torch
     from gliner import GLiNER
     from classifier import classify_text
@@ -84,30 +84,33 @@ def extract_resume(filepath):
     try:
         # Try CV approach first with PyMuPDF
         doc = fitz.open(filepath)
-        fonts = set()
-        blocks_count = 0
-        x0_positions = set()
-        
-        for page in doc:
-            text += page.get_text() + "\n"
-            dict_data = page.get_text("dict")
-            for block in dict_data.get("blocks", []):
-                if block.get("type") == 0: # Text block
-                    blocks_count += 1
-                    bbox = block.get("bbox", [])
-                    if len(bbox) == 4:
-                        # simple column detection heuristic based on X positions
-                        x0 = round(bbox[0] / 50.0) * 50
-                        x0_positions.add(x0)
-                        
-                    for line in block.get("lines", []):
-                        for span in line.get("spans", []):
-                            fonts.add(round(span.get("size", 10), 1))
+        try:
+            fonts = set()
+            blocks_count = 0
+            x0_positions = set()
+            
+            for page in doc:
+                text += page.get_text() + "\n"
+                dict_data = page.get_text("dict")
+                for block in dict_data.get("blocks", []):
+                    if block.get("type") == 0: # Text block
+                        blocks_count += 1
+                        bbox = block.get("bbox", [])
+                        if len(bbox) == 4:
+                            # simple column detection heuristic based on X positions
+                            x0 = round(bbox[0] / 50.0) * 50
+                            x0_positions.add(x0)
                             
-        layout_features["total_blocks"] = blocks_count
-        layout_features["font_hierarchy_levels"] = len(fonts)
-        layout_features["has_columns"] = len(x0_positions) > 2
-        
+                        for line in block.get("lines", []):
+                            for span in line.get("spans", []):
+                                fonts.add(round(span.get("size", 10), 1))
+                                
+            layout_features["total_blocks"] = blocks_count
+            layout_features["font_hierarchy_levels"] = len(fonts)
+            layout_features["has_columns"] = len(x0_positions) > 2
+        finally:
+            doc.close()
+            
     except Exception:
         # Fallback to simple text extraction if PyMuPDF CV fails
         try:
