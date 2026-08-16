@@ -5,9 +5,12 @@ import os
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
 
-def calculate_similarity(profile_path):
-    with open(profile_path, 'r') as f:
-        profile = json.load(f)
+def calculate_similarity(profile_data):
+    if isinstance(profile_data, str):
+        with open(profile_data, 'r') as f:
+            profile = json.load(f)
+    else:
+        profile = profile_data
         
     raw_text = profile.get("raw_text_snippet", "")
     proto_path = os.path.join("data", "prototypes.json")
@@ -15,8 +18,7 @@ def calculate_similarity(profile_path):
     meta_path = os.path.join("data", "cv_metadata.json")
     
     if not os.path.exists(proto_path) or not os.path.exists(emb_path):
-        print("===START===")
-        print(json.dumps({
+        return {
             "classification": {
                 "category": profile.get("career_signal", {}).get("dataset_category", "UNKNOWN"),
                 "confidence": profile.get("career_signal", {}).get("confidence", 0.0)
@@ -26,9 +28,7 @@ def calculate_similarity(profile_path):
             ],
             "similar_cvs": [],
             "analysis": "Data not found. Run build_prototypes.py."
-        }))
-        print("===END===")
-        return
+        }
         
     with open(proto_path, 'r') as f:
         prototypes = json.load(f)
@@ -83,11 +83,12 @@ def calculate_similarity(profile_path):
         "profile_projects": [p.get("title", p.get("name", "Unknown")) for p in profile.get("projects", [])]
     }
     
-    print("===START===")
-    print(json.dumps(output))
-    print("===END===")
+    return output
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         sys.exit(1)
-    calculate_similarity(sys.argv[1])
+    output = calculate_similarity(sys.argv[1])
+    print("===START===")
+    print(json.dumps(output))
+    print("===END===")

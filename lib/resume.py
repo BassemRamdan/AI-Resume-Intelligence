@@ -314,10 +314,7 @@ def extract_resume(filepath):
     profile["filename"] = filepath.split("/")[-1].split("\\")[-1]
     profile["raw_text_snippet"] = cleaned_text[:3000] # Provide extensive raw text for Groq validation
 
-    # Must only print JSON to stdout so Node.js can parse it
-    print("===START===")
-    print(json.dumps(profile))
-    print("===END===")
+    return profile
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -327,4 +324,8 @@ if __name__ == "__main__":
         sys.exit(1)
     
     filepath = sys.argv[1]
-    extract_resume(filepath)
+    profile = extract_resume(filepath)
+    if profile:
+        print("===START===")
+        print(json.dumps(profile))
+        print("===END===")
