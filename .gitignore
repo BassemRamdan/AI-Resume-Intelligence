@@ -48,3 +48,6 @@ __pycache__/
 data/resume_layout_dataset.json
 
 notebooks/resume_layout_dataset.json
+
+AGENTS.md
+CLAUDE.md
