@@ -207,6 +207,9 @@ def extract_resume(filepath):
 
     # --- EXPERIENCE ---
     exp_text = sections.get("EXPERIENCE", "")
+    if not exp_text.strip():
+        exp_text = sections.get("UNCLASSIFIED", "")
+        
     if exp_text:
         preds = extract_from_text(exp_text, ["job title", "company", "date"], threshold=0.2)
         
@@ -227,6 +230,9 @@ def extract_resume(filepath):
 
     # --- PROJECTS ---
     proj_text = sections.get("PROJECTS", "")
+    if not proj_text.strip():
+        proj_text = sections.get("UNCLASSIFIED", "")
+        
     if proj_text:
         preds = extract_from_text(proj_text, ["project name"], threshold=0.2)
         project_names = [p["text"] for p in preds if p["label"] == "project name"]
@@ -279,6 +285,9 @@ def extract_resume(filepath):
 
     # --- EDUCATION ---
     edu_text = sections.get("EDUCATION", "")
+    if not edu_text.strip():
+        edu_text = sections.get("UNCLASSIFIED", "")
+        
     if edu_text:
         preds = extract_from_text(edu_text, ["degree", "university"], threshold=0.4)
         edu = {"degree": "UNKNOWN", "institution": "UNKNOWN", "evidence": edu_text[:500], "confidence": 0.8}
@@ -297,6 +306,9 @@ def extract_resume(filepath):
 
     # --- CERTIFICATIONS ---
     cert_text = sections.get("CERTIFICATIONS", "")
+    if not cert_text.strip():
+        cert_text = sections.get("UNCLASSIFIED", "")
+        
     if cert_text:
         preds = extract_from_text(cert_text, ["certification"], threshold=0.4)
         for p in preds:
