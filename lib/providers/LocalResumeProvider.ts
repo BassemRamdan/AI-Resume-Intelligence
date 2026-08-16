@@ -65,7 +65,7 @@ export class LocalResumeProvider implements ResumeAnalysisProvider {
     const pdfPath = path.join(tempDir, `resume_${uuidv4()}.pdf`);
     await fs.writeFile(pdfPath, fileBuffer);
 
-    const pythonScript = path.join(process.cwd(), 'lib', 'ai', 'extract_resume.py');
+    const pythonScript = path.join(process.cwd(), 'lib', 'resume.py');
     try {
       const rawProfile = await this.runPythonScript(
         pythonScript, 
@@ -98,7 +98,7 @@ export class LocalResumeProvider implements ResumeAnalysisProvider {
 
     await fs.writeFile(profileFile, JSON.stringify(candidateProfile), 'utf-8');
 
-    const pythonScript = path.join(process.cwd(), 'lib', 'ai', 'career_engine.py');
+    const pythonScript = path.join(process.cwd(), 'lib', 'similarity.py');
     try {
       return await this.runPythonScript(
         pythonScript, 

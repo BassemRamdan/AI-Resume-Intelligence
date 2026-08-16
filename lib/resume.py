@@ -22,7 +22,7 @@ try:
     import fitz # PyMuPDF for Computer Vision layout analysis
     import torch
     from gliner import GLiNER
-    from transformers import AutoTokenizer, AutoModelForSequenceClassification
+    from classifier import classify_text
 except ImportError as e:
     print(json.dumps({"error": f"Missing dependency: {str(e)}. Please run pip install pypdf gliner transformers torch"}))
     sys.exit(1)
@@ -304,26 +304,11 @@ def extract_resume(filepath):
     if not profile["certifications"]:
         profile["certifications"] = [{"name": "UNKNOWN", "evidence": "NOT_FOUND", "confidence": 0.0}]
 
-    # 4. Classify via DeBERTa
-    predicted_category = "INFORMATION-TECHNOLOGY" # default fallback
-    try:
-        model_name = "BassemRamdan/resume-classifier-deberta"
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        classifier = AutoModelForSequenceClassification.from_pretrained(model_name).to(device)
-    except Exception as e:
-        classifier = None
-
-    if classifier:
-        inputs = tokenizer(cleaned_text, padding=True, truncation=True, max_length=512, return_tensors="pt").to(device)
-        with torch.no_grad():
-            outputs = classifier(**inputs)
-            logits = outputs.logits
-            predicted_idx = torch.argmax(logits, dim=-1).item()
-            
-        predicted_category = classifier.config.id2label.get(predicted_idx, "UNKNOWN_CATEGORY")
+    # 4. Classify via DeBERTa (moved to classifier.py)
+    predicted_category, confidence = classify_text(cleaned_text)
         
     profile["career_signal"]["dataset_category"] = predicted_category
-    profile["career_signal"]["confidence"] = 0.9
+    profile["career_signal"]["confidence"] = confidence
 
     # Add system fields
     profile["filename"] = filepath.split("/")[-1].split("\\")[-1]
