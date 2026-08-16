@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAIProvider } from '@/lib/providers';
 
+export const maxDuration = 60;
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
