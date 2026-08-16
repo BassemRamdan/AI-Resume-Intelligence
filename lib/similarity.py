@@ -5,6 +5,31 @@ import os
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
 
+_embedder = None
+_prototypes = None
+_cv_embs = None
+_cv_meta = None
+
+def get_resources():
+    global _embedder, _prototypes, _cv_embs, _cv_meta
+    
+    proto_path = os.path.join("data", "prototypes.json")
+    emb_path = os.path.join("data", "cv_embeddings.npy")
+    meta_path = os.path.join("data", "cv_metadata.json")
+    
+    if not os.path.exists(proto_path) or not os.path.exists(emb_path):
+        return None, None, None, None
+        
+    if _embedder is None:
+        _embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        with open(proto_path, 'r') as f:
+            _prototypes = json.load(f)
+        _cv_embs = np.load(emb_path)
+        with open(meta_path, 'r') as f:
+            _cv_meta = json.load(f)
+            
+    return _embedder, _prototypes, _cv_embs, _cv_meta
+
 def calculate_similarity(profile_data):
     if isinstance(profile_data, str):
         with open(profile_data, 'r') as f:
@@ -13,11 +38,10 @@ def calculate_similarity(profile_data):
         profile = profile_data
         
     raw_text = profile.get("raw_text_snippet", "")
-    proto_path = os.path.join("data", "prototypes.json")
-    emb_path = os.path.join("data", "cv_embeddings.npy")
-    meta_path = os.path.join("data", "cv_metadata.json")
     
-    if not os.path.exists(proto_path) or not os.path.exists(emb_path):
+    embedder, prototypes, cv_embs, cv_meta = get_resources()
+    
+    if embedder is None:
         return {
             "classification": {
                 "category": profile.get("career_signal", {}).get("dataset_category", "UNKNOWN"),
@@ -30,14 +54,6 @@ def calculate_similarity(profile_data):
             "analysis": "Data not found. Run build_prototypes.py."
         }
         
-    with open(proto_path, 'r') as f:
-        prototypes = json.load(f)
-        
-    cv_embs = np.load(emb_path)
-    with open(meta_path, 'r') as f:
-        cv_meta = json.load(f)
-        
-    embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
     emb = embedder.encode(raw_text, convert_to_tensor=True)
     
     # 1. Category Similarity (Prototypes)

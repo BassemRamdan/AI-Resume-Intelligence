@@ -121,11 +121,16 @@ def extract_resume(filepath):
     cleaned_text = clean_text(text)
     sections = split_into_sections(cleaned_text)
 
-    # 2. Extract Entities via GLiNER selectively
     device = "cuda" if torch.cuda.is_available() else "cpu"
     
+    global _gliner_model
+    if '_gliner_model' not in globals():
+        _gliner_model = None
+        
     try:
-        gliner_model = GLiNER.from_pretrained("urchade/gliner_multi-v2.1").to(device)
+        if _gliner_model is None:
+            _gliner_model = GLiNER.from_pretrained("urchade/gliner_multi-v2.1").to(device)
+        gliner_model = _gliner_model
     except Exception as e:
         print(json.dumps({"error": f"GLiNER loading failed: {str(e)}"}))
         return

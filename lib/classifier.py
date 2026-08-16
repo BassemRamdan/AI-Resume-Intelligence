@@ -1,6 +1,17 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
+_tokenizer = None
+_classifier = None
+
+def get_model(device):
+    global _tokenizer, _classifier
+    if _tokenizer is None or _classifier is None:
+        model_name = "BassemRamdan/resume-classifier-deberta"
+        _tokenizer = AutoTokenizer.from_pretrained(model_name)
+        _classifier = AutoModelForSequenceClassification.from_pretrained(model_name).to(device)
+    return _tokenizer, _classifier
+
 def classify_text(text):
     """
     Classifies the resume text using DeBERTa fine-tuned model.
@@ -10,9 +21,7 @@ def classify_text(text):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     
     try:
-        model_name = "BassemRamdan/resume-classifier-deberta"
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        classifier = AutoModelForSequenceClassification.from_pretrained(model_name).to(device)
+        tokenizer, classifier = get_model(device)
         
         inputs = tokenizer(text, padding=True, truncation=True, max_length=512, return_tensors="pt").to(device)
         with torch.no_grad():

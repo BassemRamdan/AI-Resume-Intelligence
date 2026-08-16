@@ -28,6 +28,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('API Error:', error);
-    return NextResponse.json({ error: error.message || 'An unexpected error occurred' }, { status: 500 });
+    const msg = error.message || 'An unexpected error occurred';
+    
+    if (msg.includes('fetch') || msg.includes('ECONNREFUSED')) {
+      return NextResponse.json({ error: 'AI service unavailable or starting up. Please ensure FastAPI is running.' }, { status: 503 });
+    }
+    
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
