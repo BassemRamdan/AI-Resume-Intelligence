@@ -54,9 +54,21 @@ export class RemoteResumeProvider implements ResumeAnalysisProvider {
       throw new Error(`Remote API Error: ${errorText}`);
     }
 
-    const profile = await response.json();
-    profile.filename = filename;
-    return profile;
+    const rawProfile = await response.json();
+    
+    // Clean with Groq just like LocalResumeProvider
+    const { GroqProvider } = require("./GroqProvider");
+    const groq = new GroqProvider();
+    const cleanedProfile = await groq.cleanProfile(rawProfile);
+    
+    // Inject deterministic fields back
+    if (rawProfile.career_signal) {
+      cleanedProfile.career_signal = rawProfile.career_signal;
+    }
+    cleanedProfile.filename = filename;
+    cleanedProfile.raw_text_snippet = rawProfile.raw_text_snippet;
+    
+    return cleanedProfile;
   }
 
 

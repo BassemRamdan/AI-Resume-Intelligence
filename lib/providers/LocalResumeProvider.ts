@@ -77,8 +77,13 @@ export class LocalResumeProvider implements ResumeAnalysisProvider {
       const groq = new GroqProvider();
       const cleanedProfile = await groq.cleanProfile(rawProfile);
       
-      // Inject filename
+      // Inject deterministic fields back to prevent Groq from hallucinating or zeroing them
+      if (rawProfile.career_signal) {
+        cleanedProfile.career_signal = rawProfile.career_signal;
+      }
       cleanedProfile.filename = filename;
+      cleanedProfile.raw_text_snippet = rawProfile.raw_text_snippet; // Keep for similarity
+      
       return cleanedProfile;
     } finally {
       try {
