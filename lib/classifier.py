@@ -17,7 +17,7 @@ def classify_text(text):
     Classifies the resume text using DeBERTa fine-tuned model.
     """
     predicted_category = "INFORMATION-TECHNOLOGY" # default fallback
-    confidence = 0.85 # Realistic fallback instead of 0.0 for presentation
+    confidence = None # Never display a fake percentage if it fails
     device = "cuda" if torch.cuda.is_available() else "cpu"
     
     try:

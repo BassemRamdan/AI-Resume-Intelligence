@@ -38,39 +38,35 @@ Return a strict JSON object following this exact schema:
     return this.callGroq(prompt);
   }
 
-
-
   async explainCareerSimilarity(similarityData: any): Promise<any> {
      const prompt = `
 You are CareerLens AI, an expert career analyst.
-The machine learning pipeline has calculated the similarity between the candidate's resume and 24 career prototypes.
-Your job is to provide a grounded, evidence-based explanation for WHY the candidate matches the top career categories.
+The machine learning pipeline has evaluated the candidate's career fit using a deterministic engine with strict percentages.
+Your job is to provide a grounded explanation for WHY the candidate matches the Top Career Fits based ONLY on the evidence provided in the JSON.
 
-RAW SIMILARITY DATA AND EXTRACTED PROFILE:
+RAW ENGINE DATA:
 ${JSON.stringify(similarityData, null, 2)}
 
 STRICT RULES:
-1. DO NOT invent skills, projects, or experience. Use ONLY what is provided in the profile data above.
-2. The score is deterministic. Explain the score using the evidence.
+1. DO NOT invent skills, projects, or experience. Use ONLY what is provided in the JSON.
+2. The score is deterministic. Explain the score using the evidence (Skill Match, Project Match, etc.).
 
 Return a strict JSON object with this schema:
 {
   "classification_analysis": "1 sentence explaining the primary classification.",
   "top_careers": [
     {
-      "category": "The category name (e.g. INFORMATION-TECHNOLOGY)",
-      "score": "The score percentage (e.g. 98.4%)",
-      "why": "A 2-3 sentence explanation of why their specific skills and projects make them similar to this career.",
-      "key_evidence": ["Skill 1", "Project A"]
+      "career": "The exact career name (e.g. Machine Learning Engineer)",
+      "total_fit": "The total_fit percentage",
+      "why": "A 2-3 sentence explanation connecting their matched skills and projects to this career.",
+      "missing_evidence": "A 1 sentence explanation of what they are missing (e.g. Docker, MLOps) based on the missing_skills array."
     }
   ],
-  "similar_profiles_analysis": "A 2-3 sentence summary explaining what the candidate shares in common with the specific Similar CVs (peer candidates) matched from the dataset."
+  "similar_profiles_analysis": "A 1-2 sentence summary explaining the KNN semantic similarity peer group."
 }
 `;
     return this.callGroq(prompt);
   }
-
-
 
   private async callGroq(prompt: string): Promise<any> {
     if (!process.env.GROQ_API_KEY) {
@@ -82,7 +78,7 @@ Return a strict JSON object with this schema:
         messages: [{ role: "user", content: prompt }],
         model: this.model,
         response_format: { type: "json_object" },
-        temperature: 0.2, // Low temperature for consistent, grounded output
+        temperature: 0.2,
       });
 
       const content = chatCompletion.choices[0]?.message?.content;
