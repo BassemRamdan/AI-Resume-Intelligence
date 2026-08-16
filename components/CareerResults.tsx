@@ -30,7 +30,12 @@ export default function CareerResults() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch career analysis.");
+        let errorMsg = "Failed to fetch career analysis.";
+        try {
+          const errorData = await response.json();
+          if (errorData.error) errorMsg = errorData.error;
+        } catch (e) {}
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
