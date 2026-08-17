@@ -37,7 +37,6 @@ export default function MarkdownMessage({ content }: MarkdownMessageProps) {
             <ol className="list-decimal pl-5 space-y-1.5 my-2 text-sm text-slate-700 font-medium" {...props} />
           ),
           li: ({ node, children, ...props }) => {
-            // Check if this item is a checklist item
             return (
               <li className="text-sm text-slate-700 flex items-start gap-2 leading-normal list-none" {...props}>
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
@@ -45,6 +44,26 @@ export default function MarkdownMessage({ content }: MarkdownMessageProps) {
               </li>
             );
           },
+          table: ({ node, ...props }) => (
+            <div className="overflow-x-auto my-4 rounded-xl border border-slate-200 shadow-sm bg-white">
+              <table className="w-full text-left text-xs md:text-sm border-collapse" {...props} />
+            </div>
+          ),
+          thead: ({ node, ...props }) => (
+            <thead className="bg-slate-100/90 text-slate-900 border-b border-slate-200 font-bold uppercase text-[11px] tracking-wider" {...props} />
+          ),
+          tbody: ({ node, ...props }) => (
+            <tbody className="divide-y divide-slate-100 bg-white" {...props} />
+          ),
+          tr: ({ node, ...props }) => (
+            <tr className="hover:bg-indigo-50/30 transition-colors" {...props} />
+          ),
+          th: ({ node, ...props }) => (
+            <th className="py-3 px-4 font-extrabold text-slate-900" {...props} />
+          ),
+          td: ({ node, ...props }) => (
+            <td className="py-2.5 px-4 text-slate-700 leading-relaxed align-top" {...props} />
+          ),
           hr: ({ node, ...props }) => (
             <hr className="border-t border-slate-200 my-4" {...props} />
           ),
