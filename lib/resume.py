@@ -69,8 +69,19 @@ def split_into_sections(text):
                     
         if not is_header:
             sections[current_section].append(line.strip())
-            
-    return {k: "\n".join(v) for k, v in sections.items() if v}
+    result = {k: "\n".join(v) for k, v in sections.items() if v}
+    
+    # Fallback: if no major sections found (e.g., non-standard headers),
+    # process the whole text EXCEPT the first 500 characters (to avoid header leakage)
+    if "EXPERIENCE" not in result and "PROJECTS" not in result and "SKILLS" not in result:
+        full_text = "\n".join(lines)
+        safe_text = full_text[500:] if len(full_text) > 800 else full_text
+        result["EXPERIENCE"] = safe_text
+        result["PROJECTS"] = safe_text
+        result["SKILLS"] = safe_text
+        result["EDUCATION"] = safe_text
+        
+    return result
 
 def is_invalid_project(name, text_block):
     """Validate project name against strict exclusion rules."""
