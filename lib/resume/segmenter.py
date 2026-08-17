@@ -1,16 +1,20 @@
 """
 Heuristic Section Segmentation Module.
-Segments cleaned resume text into functional blocks: SKILLS, EXPERIENCE, EDUCATION, PROJECTS, CERTIFICATIONS.
+Segments cleaned resume text into functional blocks:
+SKILLS, EXPERIENCE, EDUCATION, PROJECTS, CERTIFICATIONS, LANGUAGES, ACTIVITIES, SUMMARY.
 """
 
 import re
 
 SECTION_PATTERNS = {
+    "SUMMARY": r'(?:^|\n)(?:\d+\.\s*)?(?:professional\s+summary|summary|profile|about\s+me|career\s+objective|objective)\b[:\s]*',
     "SKILLS": r'(?:^|\n)(?:\d+\.\s*)?(?:technical\s+|core\s+)?(?:skills|technologies|proficiencies|tech\s+stack|competencies|expertise|tools\s+&\s+technologies)\b[:\s]*',
     "EXPERIENCE": r'(?:^|\n)(?:\d+\.\s*)?(?:work\s+|professional\s+|employment\s+)?(?:experience|history|employment|work\s+history|career\s+history)\b[:\s]*',
     "EDUCATION": r'(?:^|\n)(?:\d+\.\s*)?(?:education|academic\s+background|qualifications|academic\s+history)\b[:\s]*',
     "PROJECTS": r'(?:^|\n)(?:\d+\.\s*)?(?:key\s+|technical\s+|academic\s+|personal\s+)?(?:projects|portfolio|open\s+source|work\s+samples)\b[:\s]*',
-    "CERTIFICATIONS": r'(?:^|\n)(?:\d+\.\s*)?(?:certifications|certificates|licenses|courses|accreditations)\b[:\s]*'
+    "CERTIFICATIONS": r'(?:^|\n)(?:\d+\.\s*)?(?:certifications|certificates|licenses|courses|accreditations)(?:\s*&\s*activities)?\b[:\s]*',
+    "LANGUAGES": r'(?:^|\n)(?:\d+\.\s*)?(?:languages|language\s+proficiency|language\s+skills)\b[:\s]*',
+    "ACTIVITIES": r'(?:^|\n)(?:\d+\.\s*)?(?:activities|extracurricular|volunteering|community|honors|awards|achievements)\b[:\s]*'
 }
 
 def clean_text(text: str) -> str:
@@ -43,7 +47,6 @@ def split_into_sections(text: str) -> dict:
     sections["UNCLASSIFIED"] = ""
     
     if not positions:
-        # Fallback: if no formal headers detected, treat whole text as unclassified
         sections["UNCLASSIFIED"] = cleaned
         sections["SKILLS"] = cleaned
         sections["EXPERIENCE"] = cleaned

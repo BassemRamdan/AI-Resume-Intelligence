@@ -2,6 +2,7 @@
 Resume Extractor Pipeline.
 Combines PyMuPDF Computer Vision layout parsing, section segmentation,
 GLiNER NER entity extraction, and Skill Ontology normalization.
+Features strict filtering and deduplication for Projects, Certifications, and Languages.
 """
 
 import os
@@ -11,10 +12,35 @@ from .ontology import normalize_skill, SKILL_ONTOLOGY
 from .segmenter import clean_text, split_into_sections
 from .gliner import extract_entities_from_chunk
 
+KNOWN_TECH_TOOLS = {
+    "python", "javascript", "typescript", "c++", "c#", "java", "php", "go", "rust", "ruby",
+    "asp.net", "asp.net core", "asp.net identity", "entity framework", "entity framework core",
+    "signalr", "angular", "react", "vue", "next.js", "node.js", "express", "django", "flask", "fastapi", "laravel",
+    "sql", "sql server", "mysql", "postgresql", "mongodb", "redis", "sqlite",
+    "docker", "kubernetes", "aws", "azure", "gcp", "git", "github", "gitlab", "ci/cd",
+    "xunit", "nunit", "moq", "jest", "cypress", "pusher", "rabbitmq", "kafka", "postman"
+}
+
+def clean_item_title(text: str) -> str:
+    """Strips leading bullet points, non-ascii symbols, and whitespace from title strings."""
+    if not text:
+        return ""
+    cleaned = re.sub(r'^[^a-zA-Z0-9\(\[\{]+', '', text)
+    cleaned = cleaned.replace('\ufffd', '').strip()
+    return cleaned
+
+def is_tech_or_tool(name: str) -> bool:
+    """Check if a candidate string is a programming framework/tool rather than a standalone project name."""
+    clean = name.strip().lower()
+    if clean in KNOWN_TECH_TOOLS or clean in SKILL_ONTOLOGY:
+        return True
+    for tech in KNOWN_TECH_TOOLS:
+        if clean == tech or (len(tech) > 3 and clean.startswith(tech + " ")):
+            return True
+    return False
+
 def extract_pdf_layout(pdf_path: str) -> tuple[str, dict]:
-    """
-    Extracts raw text and CV layout features (font hierarchy, block count) using PyMuPDF.
-    """
+    """Extracts raw text and layout features using PyMuPDF."""
     doc = fitz.open(pdf_path)
     full_text = ""
     font_sizes = set()
@@ -27,7 +53,7 @@ def extract_pdf_layout(pdf_path: str) -> tuple[str, dict]:
         for b in blocks:
             if len(b) > 4 and isinstance(b[4], str):
                 for line in b[4].splitlines():
-                    pass # text line
+                    pass
                     
     doc.close()
     
@@ -76,7 +102,6 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
     first_lines = [l.strip() for l in header_chunk.splitlines() if l.strip()]
     if first_lines:
         candidate_name = first_lines[0]
-        # Ignore if header is an email or generic label
         if not re.search(r'[@\d]', candidate_name) and len(candidate_name) < 40:
             profile["identity"]["name"] = candidate_name
             
@@ -85,7 +110,6 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
     skill_evidence = {}
     text_lower = cleaned_text.lower()
     
-    # Fast regex scan against standardized ontology
     for raw_skill, canonical in SKILL_ONTOLOGY.items():
         pattern = r'\b' + re.escape(raw_skill) + r'\b'
         match = re.search(pattern, text_lower)
@@ -95,7 +119,6 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
             end = min(len(cleaned_text), match.end() + 25)
             skill_evidence[canonical] = cleaned_text[start:end].replace('\n', ' ').strip()
             
-    # GLiNER entity extraction on SKILLS section
     skills_text = sections.get("SKILLS", "")
     if skills_text.strip():
         ner_skills = extract_entities_from_chunk(skills_text, ["skill", "technology", "programming language"], threshold=0.3)
@@ -136,7 +159,6 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
                     "confidence": 0.85
                 })
         else:
-            # Fallback heuristic lines
             for line in exp_text.splitlines()[:5]:
                 if len(line.strip()) > 5:
                     profile["experience"].append({
@@ -172,56 +194,122 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
                 "confidence": 0.85
             })
             
-    # 5. Extract Projects (ALL Projects Retained as List)
+    # 5. Extract Projects (Smart Filtering + Deduplication + Localized Tech)
     proj_text = sections.get("PROJECTS", "")
     if proj_text.strip():
-        ner_proj = extract_entities_from_chunk(proj_text, ["project", "software", "application"], threshold=0.3)
-        found_projs = []
-        for p in ner_proj:
-            p_name = p["text"].strip()
-            if len(p_name) > 2 and p_name not in found_projs:
-                found_projs.append(p_name)
+        # Split project section into individual project items/lines
+        raw_proj_lines = [l.strip() for l in proj_text.splitlines() if l.strip()]
+        
+        # Candidate project titles: lines starting with bullet or title-cased headers
+        candidate_projects = []
+        for line in raw_proj_lines:
+            clean_line = clean_item_title(line)
+            # If line is short and looks like a title (e.g. "ChatApp – Real-time Chat Application" or "Ecom-App")
+            if 3 <= len(clean_line) <= 65 and not clean_line.startswith(("http", "www", "git")):
+                # Check if it is merely a single technology/tool
+                if not is_tech_or_tool(clean_line):
+                    candidate_projects.append(clean_line)
+                    
+        # If line parsing didn't find clear titles, try GLiNER
+        if not candidate_projects:
+            ner_proj = extract_entities_from_chunk(proj_text, ["project", "software", "application"], threshold=0.45)
+            for p in ner_proj:
+                p_name = clean_item_title(p["text"])
+                if len(p_name) > 3 and not is_tech_or_tool(p_name):
+                    candidate_projects.append(p_name)
+                    
+        # Deduplicate candidate projects (e.g. "ChatApp" and "Real-time Chat Application")
+        deduped_projects = []
+        seen_keys = set()
+        
+        for p in candidate_projects:
+            # Extract main title before delimiter (e.g. "ChatApp – Real-time..." -> "ChatApp")
+            p_clean = clean_item_title(p)
+            main_title = re.split(r'[\–\-\|\:]', p_clean)[0].strip()
+            norm_key = re.sub(r'[^a-zA-Z0-9]', '', main_title.lower())
+            
+            if not norm_key or norm_key in seen_keys or len(norm_key) < 2:
+                continue
                 
-        if found_projs:
-            for p_name in found_projs:
-                profile["projects"].append({
-                    "name": p_name,
-                    "description": "Technical project extracted from portfolio section",
-                    "technologies": [s for s in found_skills if s.lower() in proj_text.lower()][:5],
-                    "role": "Developer / Contributor",
-                    "links": [],
-                    "evidence": p_name,
-                    "confidence": 0.80
-                })
-        else:
-            # Line-based fallback
-            proj_lines = [l.strip() for l in proj_text.splitlines() if len(l.strip()) > 4][:5]
-            for pl in proj_lines:
-                profile["projects"].append({
-                    "name": pl[:40],
-                    "description": pl,
-                    "technologies": [],
-                    "role": "Contributor",
-                    "links": [],
-                    "evidence": pl,
-                    "confidence": 0.70
-                })
+            # Check for substring redundancy
+            is_sub = False
+            for existing in seen_keys:
+                if norm_key in existing or existing in norm_key:
+                    is_sub = True
+                    break
+            if is_sub:
+                continue
                 
-    # 6. Extract Certifications
+            seen_keys.add(norm_key)
+            
+            # Find localized technologies for this project
+            local_techs = [
+                s for s in found_skills 
+                if s.lower() in proj_text.lower()
+            ][:5]
+            
+            deduped_projects.append({
+                "name": p_clean,
+                "description": "Technical project extracted from resume portfolio section",
+                "technologies": local_techs,
+                "role": "Developer / Contributor",
+                "links": [],
+                "evidence": p_clean,
+                "confidence": 0.85
+            })
+            
+        profile["projects"] = deduped_projects
+        
+    # 6. Extract Certifications (Cleaned & Filtered)
     cert_text = sections.get("CERTIFICATIONS", "")
     if cert_text.strip():
-        for line in cert_text.splitlines():
-            line_str = line.strip()
-            if len(line_str) > 4:
-                profile["certifications"].append({
-                    "name": line_str,
-                    "issuer": "Accredited Provider",
-                    "date": "UNKNOWN",
-                    "evidence": line_str,
-                    "confidence": 0.85
+        cert_lines = cert_text.splitlines()
+        for line in cert_lines:
+            clean_l = clean_item_title(line)
+            # Ignore noise lines, section headers, and languages
+            if not clean_l or len(clean_l) < 6:
+                continue
+            if re.match(r'^(?:&\s*activities|languages|activities|skills|native|intermediate)', clean_l, re.IGNORECASE):
+                continue
+            if "native" in clean_l.lower() or "intermediate" in clean_l.lower():
+                continue
+                
+            # Parse Title vs Issuer if separator present
+            parts = [p.strip() for p in re.split(r'[\s]*[-–—|:\u2013\u2014]+[\s]*', clean_l, maxsplit=1)]
+            title = parts[0]
+            issuer = parts[1] if len(parts) > 1 and parts[1] else "Accredited Provider"
+            
+            profile["certifications"].append({
+                "name": title,
+                "issuer": issuer,
+                "date": "Verified",
+                "evidence": clean_l,
+                "confidence": 0.90
+            })
+            
+    # 7. Extract Languages
+    lang_text = sections.get("LANGUAGES", "")
+    if lang_text.strip():
+        for line in lang_text.splitlines():
+            clean_lang = clean_item_title(line)
+            if clean_lang and len(clean_lang) > 3:
+                parts = clean_lang.split(":")
+                lang_name = parts[0].strip()
+                proficiency = parts[1].strip() if len(parts) > 1 else "Proficient"
+                profile["languages"].append({
+                    "language": lang_name,
+                    "proficiency": proficiency
                 })
                 
-    # 7. Sequence Classifier Signal
+    # 8. Extract Activities / Achievements
+    act_text = sections.get("ACTIVITIES", "")
+    if act_text.strip():
+        for line in act_text.splitlines():
+            clean_act = clean_item_title(line)
+            if len(clean_act) > 10:
+                profile["achievements"].append(clean_act)
+                
+    # 9. Sequence Classifier Signal
     if classifier_fn is not None:
         try:
             signal = classifier_fn(cleaned_text)
