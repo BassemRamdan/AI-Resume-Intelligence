@@ -18,11 +18,18 @@ def get_resources():
     emb_path = os.path.join("data", "cv_embeddings.npy")
     meta_path = os.path.join("data", "cv_metadata.json")
     
+    # If run from api directory, adjust path
+    if not os.path.exists(proto_path) and os.path.exists(os.path.join("..", proto_path)):
+        proto_path = os.path.join("..", proto_path)
+        emb_path = os.path.join("..", emb_path)
+        meta_path = os.path.join("..", meta_path)
+        
     if not os.path.exists(proto_path) or not os.path.exists(emb_path):
         return None, None, None, None
         
     if _embedder is None:
-        _embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+        # Force CPU to prevent CUDA multiprocessing mismatch errors during similarity calc
+        _embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device='cpu')
         with open(proto_path, 'r') as f:
             _prototypes = json.load(f)
         _cv_embs = np.load(emb_path)
@@ -32,6 +39,10 @@ def get_resources():
     return _embedder, _prototypes, _cv_embs, _cv_meta
 
 def normalize_text(text):
+    if isinstance(text, list):
+        text = " ".join([str(x) for x in text])
+    if not isinstance(text, str):
+        text = str(text)
     return text.lower().strip() if text else ""
 
 def calculate_similarity(profile_data):
@@ -62,7 +73,7 @@ def calculate_similarity(profile_data):
     emb = embedder.encode(raw_text, convert_to_tensor=True)
     
     # 1. KNN Similar CVs (Semantic Similarity ONLY)
-    cv_embs_tensor = torch.tensor(cv_embs)
+    cv_embs_tensor = torch.tensor(cv_embs).to(emb.device)
     cos_scores = util.cos_sim(emb, cv_embs_tensor)[0]
     top_results = torch.topk(cos_scores, k=3)
     
@@ -136,7 +147,7 @@ def calculate_similarity(profile_data):
         semantic_score = 0.0
         dataset_cat = criteria.get("dataset_category", "")
         if dataset_cat in prototypes:
-            proto_tensor = torch.tensor(prototypes[dataset_cat])
+            proto_tensor = torch.tensor(prototypes[dataset_cat]).to(emb.device)
             s_val = util.cos_sim(emb, proto_tensor)[0][0].item()
             semantic_score = max(0.0, s_val)
             

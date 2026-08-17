@@ -1,86 +1,62 @@
-# CareerLens AI
+# CareerLens AI - Intelligent Resume Analyzer
 
-CareerLens AI is a Resume Intelligence platform that utilizes Machine Learning, NLP, and Semantic Similarity to deterministically map candidate resumes to the most suitable career pathways based on a robust dataset of over 2,400 resumes.
+CareerLens AI is an advanced, production-ready AI pipeline for resume parsing, career classification, and semantic matching. Built to handle real-world parsing challenges with zero hallucination.
 
-## Problem
-Traditional resume parsers often rely on simple keyword matching or hallucination-prone LLMs. CareerLens AI solves this by deploying a strict deterministic pipeline. It extracts facts (Skills, Projects, Education) and maps them against canonical career centroids to provide mathematically grounded career intelligence.
+## Core Features
 
-## Datasets
-This project was trained and built on a robust 3-Dataset architecture:
-1. **[Raw Resumes Dataset](https://huggingface.co/datasets/BassemRamdan/data)**: 2,484+ raw PDFs distributed across 24 distinct career categories.
-2. **[Cleaned Resume Entities Dataset](https://huggingface.co/datasets/Youssef-mohamed123/resume_entities)**: The NLP-extracted structured entities (Skills, Projects, Education, Experience).
-3. **Career Classification & Taxonomy**: The fine-tuned data enabling the similarity engine to map canonical career centroids and validate skill ontologies.
+- **Deterministic Entity Extraction**: Uses `PyMuPDF` for structural layout parsing and `GLiNER` (Named Entity Recognition) to explicitly extract skills, projects, and experiences without the hallucination risks of traditional LLMs.
+- **Career Classification**: Employs a fine-tuned `DeBERTa`/`DistilBERT` model on thousands of resumes to predict the primary career category with high confidence.
+- **Semantic Job Matching**: Leverages `SentenceTransformers` (`all-MiniLM-L6-v2`) to compute cosine similarity between the candidate's skills/projects and 24 distinct career prototypes.
+- **Explainable AI (XAI)**: Breaks down the matching score mathematically (Skills 35%, Projects 20%, Semantic 20%, Education 10%, Experience 10%, Class 5%) for complete transparency.
+- **Grounded Verification**: Uses `Groq (LLaMA-3.1)` solely as a JSON formatter and evidence validator, strictly preventing data fabrication.
 
-## Architecture
+## Architecture & Pipeline
 
-Our application is designed around a multi-stage AI pipeline:
+1. **Upload & Parse**: `lib/resume.py` segments the PDF to avoid cross-section entity bleed (e.g., preventing a header name from being classified as a project).
+2. **Entity Extraction**: `GLiNER` extracts technical skills and project details deterministically.
+3. **Classification**: `lib/classifier.py` runs the extracted text through DistilBERT to get a structural career signal.
+4. **Formatting**: `lib/providers/GroqProvider.ts` forces the extracted data into a strictly typed JSON profile, checking against raw text evidence.
+5. **Matching**: `lib/similarity.py` calculates the exact fit percentage and generates actionable career roadmaps.
 
-### 1. NLP Pipeline
-When a user uploads a PDF resume:
-- `PyMuPDF (fitz)` extracts the raw text and Computer Vision layout hierarchies.
-- `GLiNER` (a generalized NER model) extracts specific entities like Skills, Experience, Education, and Projects.
-- Regular expressions cross-reference an internal Skill Ontology to prevent hallucinated technologies.
-
-### 2. Classification
-A fine-tuned DeBERTa model processes the resume to assign a primary career classification from the 24 available categories in the training set.
-
-### 3. Similarity Engine
-- The entire dataset of 2,400 resumes was embedded into vectors using `sentence-transformers/all-MiniLM-L6-v2`.
-- Canonical category "prototypes" (centroids) were generated.
-- When a new resume is processed, it is mapped against the entire dataset space using K-Nearest Neighbors (KNN).
-- The engine calculates Cosine Similarity to find both the most aligned Career Categories and specific Peer Candidate Resumes.
-
-### 4. RAG / Groq Explainability
-Once the Python ML backend deterministically calculates the classification and similarity scores, the data is sent to Groq (`llama-3.1-8b-instant`). The LLM acts solely as a RAG (Retrieval-Augmented Generation) Explainer—synthesizing a natural language explanation of *why* the candidate matched, based strictly on the extracted evidence.
-
----
-
-## Installation & Running
+## Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- Python (3.10+)
-- `npm` or `pnpm`
+- Python 3.9+
+- Node.js 18+
+- Groq API Key
 
-### Setup Environment
-1. Clone the repository.
-2. Install the Node dependencies:
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repo-url>
+   cd AI-Resume-Intelligence
+   ```
+
+2. **Backend Setup:**
+   ```bash
+   pip install -r requirements.txt
+   python main.py
+   ```
+
+3. **Frontend Setup:**
    ```bash
    npm install
-   ```
-3. Create a Python Virtual Environment and install dependencies:
-   ```bash
-   python -m venv venv
-   .\venv\Scripts\activate
-   pip install pypdf PyMuPDF torch gliner transformers sentence-transformers datasets numpy pandas
-   ```
-4. Configure `.env.local` (copy from `.env.example`) and add your Groq API key:
-   ```env
-   GROQ_API_KEY=your_key_here
-   ```
-
-### Running the Application
-1. (Optional) Run the prototype generator to rebuild dataset embeddings:
-   ```bash
-   python build_prototypes.py
-   ```
-2. Start the Next.js development server:
-   ```bash
    npm run dev
    ```
-3. Navigate to `http://localhost:3000` to upload a test resume.
 
----
+4. **Environment Variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   GROQ_API_KEY=your_api_key_here
+   ```
 
-## Notebooks
-The ML research for this project is systematically structured in the `notebooks/` directory for reproducibility:
-- `01_EDA.ipynb`: Data exploration and distribution analysis.
-- `02_Preprocessing.ipynb`: Text cleaning and train/test splitting.
-- `03_NLP_Extraction.ipynb`: Entity Extraction via GLiNER.
-- `04_Baseline.ipynb`: Classical TF-IDF + Logistic Regression baseline.
-- `05_FineTuning.ipynb`: Transformer fine-tuning against the baseline.
-- `06_Career_Similarity.ipynb`: Embedding generation and prototype cosine similarity logic.
+## Repository Structure
 
-## Future Work
-- Expanding the Skill Ontology.
-- Enhancing the LayoutLM multimodal component for parsing non-standard resume formats.
+- `/app`: Next.js 14 frontend (App Router) with Tailwind CSS.
+- `/lib`: Core Python ML pipeline (`resume.py`, `classifier.py`, `similarity.py`).
+- `/notebooks`: Research and Development notebooks containing EDA, data preprocessing, and model fine-tuning.
+
+## Design Philosophy
+
+The system was designed with **Anti-Hallucination** as its core principle. By chaining traditional deterministic ML models (GLiNER, DistilBERT) with LLM formatters (Groq), we achieve sub-second latency while guaranteeing 100% evidence-backed data extraction.

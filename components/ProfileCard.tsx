@@ -33,6 +33,8 @@ export default function ProfileCard() {
       if (typeof item === 'object') {
         // If it's a completely unknown object
         if (item.name === "UNKNOWN" || item.job_title === "UNKNOWN" || item.institution === "UNKNOWN") return false;
+        // If there's explicitly no evidence, it's not verified
+        if (item.evidence === "NOT_FOUND" || item.evidence === "UNKNOWN") return false;
         return true;
       }
       return false;

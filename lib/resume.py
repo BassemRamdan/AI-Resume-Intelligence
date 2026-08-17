@@ -34,7 +34,7 @@ def clean_text(text):
     return clean.strip()
 
 def split_into_sections(text):
-    """Robust heuristic-based section splitting."""
+    """Robust heuristic-based section splitting with explicit HEADER."""
     section_headers = {
         "SUMMARY": [r"\bsummary\b", r"\bprofile\b", r"\bobjective\b", r"\babout me\b", r"\bprofessional summary\b"],
         "EXPERIENCE": [r"\bexperience\b", r"\bwork experience\b", r"\bemployment\b", r"\bprofessional experience\b", r"\bwork history\b", r"\bcareer history\b"],
@@ -45,9 +45,11 @@ def split_into_sections(text):
         "ACHIEVEMENTS": [r"\bachievements\b", r"\bawards\b", r"\bhonors\b"]
     }
     
-    sections = {}
-    current_section = "UNCLASSIFIED"
-    sections[current_section] = []
+    sections = {k: [] for k in section_headers.keys()}
+    sections["HEADER"] = []
+    sections["OTHER"] = []
+    
+    current_section = "HEADER"
     
     lines = text.split('\n')
     for line in lines:
@@ -62,69 +64,107 @@ def split_into_sections(text):
             for sec_name, regex_list in section_headers.items():
                 if any(re.search(pat, cleaned_line) for pat in regex_list):
                     current_section = sec_name
-                    if current_section not in sections:
-                        sections[current_section] = []
                     is_header = True
                     break
                     
         if not is_header:
             sections[current_section].append(line.strip())
             
-    return {k: "\n".join(v) for k, v in sections.items()}
+    return {k: "\n".join(v) for k, v in sections.items() if v}
 
-def extract_resume(filepath):
+def is_invalid_project(name, text_block):
+    """Validate project name against strict exclusion rules."""
+    name_lower = name.lower()
+    invalid_keywords = [
+        "student", "bachelor", "master", "phd", "university", 
+        "faculty", "email", "gmail", "github", "linkedin",
+        "computer science"
+    ]
+    if any(k in name_lower for k in invalid_keywords):
+        return True
+    
+    # Check if it looks like an email or url
+    if "@" in name or "http" in name or "www." in name or ".com" in name:
+        return True
+        
+    # Check if it's too short or suspiciously long
+    if len(name) < 3 or len(name) > 80:
+        return True
+        
+    return False
+
+def is_invalid_experience(job_title, company):
+    """Validate experience against strict academic/student rules."""
+    title_lower = job_title.lower() if job_title else ""
+    invalid_titles = ["student", "bachelor", "undergraduate", "candidate", "degree"]
+    if any(k in title_lower for k in invalid_titles):
+        return True
+    return False
+
+def extract_resume(filepath, text_input=None):
     # 1. Computer Vision / Layout Analysis & Text Extraction
     layout_features = {
         "has_columns": False,
         "font_hierarchy_levels": 1,
         "total_blocks": 0
     }
-    text = ""
     
-    try:
-        # Try CV approach first with PyMuPDF
-        doc = fitz.open(filepath)
+    if text_input is not None:
+        text = text_input
+    else:
+        text = ""
         try:
-            fonts = set()
-            blocks_count = 0
-            x0_positions = set()
-            
-            for page in doc:
-                text += page.get_text() + "\n"
-                dict_data = page.get_text("dict")
-                for block in dict_data.get("blocks", []):
-                    if block.get("type") == 0: # Text block
-                        blocks_count += 1
-                        bbox = block.get("bbox", [])
-                        if len(bbox) == 4:
-                            # simple column detection heuristic based on X positions
-                            x0 = round(bbox[0] / 50.0) * 50
-                            x0_positions.add(x0)
-                            
-                        for line in block.get("lines", []):
-                            for span in line.get("spans", []):
-                                fonts.add(round(span.get("size", 10), 1))
+            # Try CV approach first with PyMuPDF
+            doc = fitz.open(filepath)
+            try:
+                fonts = set()
+                blocks_count = 0
+                x0_positions = set()
+                
+                for page in doc:
+                    text += page.get_text() + "\n"
+                    dict_data = page.get_text("dict")
+                    for block in dict_data.get("blocks", []):
+                        if block.get("type") == 0: # Text block
+                            blocks_count += 1
+                            bbox = block.get("bbox", [])
+                            if len(bbox) == 4:
+                                # simple column detection heuristic based on X positions
+                                x0 = round(bbox[0] / 50.0) * 50
+                                x0_positions.add(x0)
                                 
-            layout_features["total_blocks"] = blocks_count
-            layout_features["font_hierarchy_levels"] = len(fonts)
-            layout_features["has_columns"] = len(x0_positions) > 2
-        finally:
-            doc.close()
-            
-    except Exception:
-        # Fallback to simple text extraction if PyMuPDF CV fails
-        try:
-            reader = PdfReader(filepath)
-            for page in reader.pages:
-                text += page.extract_text() + "\n"
-        except Exception as e:
-            print(json.dumps({"error": f"Failed to read PDF: {str(e)}"}))
-            return
+                            for line in block.get("lines", []):
+                                for span in line.get("spans", []):
+                                    fonts.add(round(span.get("size", 10), 1))
+                                    
+                layout_features["total_blocks"] = blocks_count
+                layout_features["font_hierarchy_levels"] = len(fonts)
+                layout_features["has_columns"] = len(x0_positions) > 2
+            finally:
+                doc.close()
+                
+        except Exception:
+            # Fallback to simple text extraction if PyMuPDF CV fails
+            try:
+                reader = PdfReader(filepath)
+                for page in reader.pages:
+                    text += page.extract_text() + "\n"
+            except Exception as e:
+                print(json.dumps({"error": f"Failed to read PDF: {str(e)}"}))
+                return None
 
     cleaned_text = clean_text(text)
     sections = split_into_sections(cleaned_text)
+    
+    if os.environ.get("DEBUG_EXTRACTION") == "1":
+        print("\n=== DEBUG: SEGMENTATION ===")
+        for sec, content in sections.items():
+            print(f"SECTION: {sec}")
+            print(content)
+            print("-" * 20)
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    # Force CPU to avoid CUDA multiprocessing crashes in FastAPI threads
+    device = "cpu"
     
     global _gliner_model
     if '_gliner_model' not in globals():
@@ -136,7 +176,7 @@ def extract_resume(filepath):
         gliner_model = _gliner_model
     except Exception as e:
         print(json.dumps({"error": f"GLiNER loading failed: {str(e)}"}))
-        return
+        return None
 
     # Helper function for targeted extraction
     def extract_from_text(text_chunk, labels, threshold=0.4):
@@ -165,13 +205,13 @@ def extract_resume(filepath):
         "career_signal": {"dataset_category": "UNKNOWN_CATEGORY", "confidence": 0.0}
     }
     
-    # 3. Process Sections
+    # 3. Process Sections Strictly
     
     # --- SKILLS ---
     found_skills = set()
     skill_evidence = {}
     
-    # Regex fallback across ENTIRE text
+    # Regex fallback across ENTIRE text (safe for skills)
     text_lower = cleaned_text.lower()
     for raw_skill, canonical in SKILL_ONTOLOGY.items():
         pattern = r'\b' + re.escape(raw_skill) + r'\b'
@@ -183,8 +223,8 @@ def extract_resume(filepath):
             end = min(len(text_lower), match.end() + 30)
             skill_evidence[canonical] = cleaned_text[start:end].replace('\n', ' ').strip()
             
-    # GLiNER on Skills and Unclassified
-    skill_text = sections.get("SKILLS", "") + "\n" + sections.get("UNCLASSIFIED", "")
+    # GLiNER explicitly on SKILLS section ONLY
+    skill_text = sections.get("SKILLS", "")
     if skill_text.strip():
         preds = extract_from_text(skill_text, ["skill"], threshold=0.3)
         for p in preds:
@@ -201,51 +241,54 @@ def extract_resume(filepath):
             "evidence": skill_evidence.get(s, "Detected via regex"),
             "confidence": 0.95
         })
-        
-    if not profile["skills"]:
-        profile["skills"] = [{"name": "UNKNOWN", "evidence": "NOT_FOUND", "confidence": 0.0}]
 
     # --- EXPERIENCE ---
     exp_text = sections.get("EXPERIENCE", "")
-    if not exp_text.strip():
-        exp_text = sections.get("UNCLASSIFIED", "")
-        
-    if exp_text:
+    if exp_text.strip():
         preds = extract_from_text(exp_text, ["job title", "company", "date"], threshold=0.2)
         
+        # Currently simplified to 1 job block for prototype, but validated
         current_job = {"job_title": "UNKNOWN", "company": "UNKNOWN", "evidence": "", "confidence": 0.8}
         
         for p in preds:
-            if p["label"] == "job title":
+            if p["label"] == "job title" and current_job["job_title"] == "UNKNOWN":
                 current_job["job_title"] = p["text"]
-            elif p["label"] == "company":
+            elif p["label"] == "company" and current_job["company"] == "UNKNOWN":
                 current_job["company"] = p["text"]
                 
-        # Dump up to 3000 chars of the block so Groq can fully reconstruct all jobs
-        current_job["evidence"] = exp_text[:3000] 
-        profile["experience"].append(current_job)
-            
-    if not profile["experience"]:
-        profile["experience"] = [{"job_title": "UNKNOWN", "company": "UNKNOWN", "evidence": "NOT_FOUND", "confidence": 0.0}]
+        if not is_invalid_experience(current_job["job_title"], current_job["company"]):
+            if current_job["job_title"] != "UNKNOWN" or current_job["company"] != "UNKNOWN":
+                current_job["evidence"] = exp_text[:1500] 
+                profile["experience"].append(current_job)
+                
+        if os.environ.get("DEBUG_EXTRACTION") == "1":
+            print("\n=== DEBUG: EXPERIENCE ===")
+            print(f"Candidates found: {preds}")
+            print(f"Accepted: {profile['experience']}")
 
     # --- PROJECTS ---
     proj_text = sections.get("PROJECTS", "")
-    if not proj_text.strip():
-        proj_text = sections.get("UNCLASSIFIED", "")
-        
-    if proj_text:
+    if proj_text.strip():
         preds = extract_from_text(proj_text, ["project name"], threshold=0.2)
         project_names = [p["text"] for p in preds if p["label"] == "project name"]
         
+        if os.environ.get("DEBUG_EXTRACTION") == "1":
+            print("\n=== DEBUG: PROJECTS ===")
+            print(f"Raw candidates: {project_names}")
+        
         if project_names:
-            # Keep order and make unique
+            # Keep order and make unique, run strict validation
             seen = set()
             unique_names = []
             for name in project_names:
                 if name.lower() not in seen:
-                    unique_names.append(name)
+                    if not is_invalid_project(name, proj_text):
+                        unique_names.append(name)
+                    elif os.environ.get("DEBUG_EXTRACTION") == "1":
+                        print(f"Rejected project: {name}")
                     seen.add(name.lower())
             
+            # Extract local evidence for each valid project
             for i, name in enumerate(unique_names):
                 idx = proj_text.find(name)
                 start_idx = max(0, idx - 50) if idx != -1 else 0
@@ -270,59 +313,36 @@ def extract_resume(filepath):
                     "evidence": chunk[:1500],
                     "confidence": 0.8
                 })
-        else:
-            # Fallback if GLiNER misses project names but section exists
-            profile["projects"].append({
-                "title": "General Projects",
-                "description": "UNKNOWN",
-                "technologies": ["UNKNOWN"],
-                "evidence": proj_text[:2000],
-                "confidence": 0.5
-            })
-            
-    if not profile["projects"]:
-        profile["projects"] = []
 
     # --- EDUCATION ---
-    edu_text = sections.get("EDUCATION", "")
-    if not edu_text.strip():
-        edu_text = sections.get("UNCLASSIFIED", "")
-        
-    if edu_text:
+    # Merge HEADER and EDUCATION sections for academic info (students usually put degree in header)
+    edu_text = sections.get("HEADER", "") + "\n" + sections.get("EDUCATION", "")
+    if edu_text.strip():
         preds = extract_from_text(edu_text, ["degree", "university"], threshold=0.4)
-        edu = {"degree": "UNKNOWN", "institution": "UNKNOWN", "evidence": edu_text[:500], "confidence": 0.8}
+        edu = {"degree": "UNKNOWN", "institution": "UNKNOWN", "evidence": edu_text[:1500], "confidence": 0.8}
         
         for p in preds:
-            if p["label"] == "degree" and p["text"].lower() not in ["bachelor", "master", "university"]:
+            if p["label"] == "degree":
                 edu["degree"] = p["text"]
             elif p["label"] == "university":
                 edu["institution"] = p["text"]
                 
         if edu["degree"] != "UNKNOWN" or edu["institution"] != "UNKNOWN":
             profile["education"].append(edu)
-            
-    if not profile["education"]:
-        profile["education"] = [{"institution": "UNKNOWN", "degree": "UNKNOWN", "evidence": "NOT_FOUND", "confidence": 0.0}]
 
     # --- CERTIFICATIONS ---
     cert_text = sections.get("CERTIFICATIONS", "")
-    if not cert_text.strip():
-        cert_text = sections.get("UNCLASSIFIED", "")
-        
-    if cert_text:
+    if cert_text.strip():
         preds = extract_from_text(cert_text, ["certification"], threshold=0.4)
         for p in preds:
             # Filter generic headers
             if p["text"].lower() not in ["certifications", "training certifications", "courses"]:
                 profile["certifications"].append({
                     "name": p["text"],
-                    "issuer": "UNKNOWN",
+                    "issuer": "Various",
                     "evidence": cert_text[:500],
                     "confidence": 0.8
                 })
-                
-    if not profile["certifications"]:
-        profile["certifications"] = [{"name": "UNKNOWN", "evidence": "NOT_FOUND", "confidence": 0.0}]
 
     # 4. Classify via DeBERTa (moved to classifier.py)
     predicted_category, confidence = classify_text(cleaned_text)
@@ -331,7 +351,7 @@ def extract_resume(filepath):
     profile["career_signal"]["confidence"] = confidence
 
     # Add system fields
-    profile["filename"] = filepath.split("/")[-1].split("\\")[-1]
+    profile["filename"] = filepath.split("/")[-1].split("\\")[-1] if filepath else "text_input"
     profile["raw_text_snippet"] = cleaned_text[:3000] # Provide extensive raw text for Groq validation
 
     return profile

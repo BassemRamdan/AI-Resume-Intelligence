@@ -51,3 +51,8 @@ notebooks/resume_layout_dataset.json
 
 AGENTS.md
 CLAUDE.md
+public/project_explanation.html
+notebooks/deberta-resume-classifier/
+notebooks/final_resume_classifier/
+models/distilbert-resume-classifier/
+notebooks/nlp_processed_resumes.csv

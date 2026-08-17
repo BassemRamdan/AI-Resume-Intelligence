@@ -53,7 +53,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="mt-24 grid grid-cols-1 md:grid-cols-4 gap-6 w-full max-w-5xl"
+          className="mt-24 grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl"
         >
           <FeatureCard 
             icon={<FileSearch className="w-6 h-6 text-indigo-600" />}
@@ -65,16 +65,47 @@ export default function Home() {
             title="Career Discovery"
             description="Visualize your readiness for adjacent and alternative career roles."
           />
-          <FeatureCard 
-            icon={<Briefcase className="w-6 h-6 text-indigo-600" />}
-            title="Explainable Match"
-            description="See exactly why you match a job, backed by direct resume evidence."
-          />
-          <FeatureCard 
-            icon={<Map className="w-6 h-6 text-indigo-600" />}
-            title="AI Learning Roadmap"
-            description="Close your skill gaps with a tailored, RAG-grounded curriculum."
-          />
+        </motion.div>
+
+        {/* System Architecture Explanation */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="mt-32 w-full max-w-5xl text-left"
+        >
+          <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">How The Hybrid Pipeline Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold">1</div>
+                <h3 className="text-xl font-bold text-slate-900">Information Extraction (Groq & GLiNER)</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed">
+                When you upload a CV, we use <strong>PyMuPDF</strong> to extract the text structure. Then, we use a specialized NLP model called <strong>GLiNER</strong> to find entities (like job titles and universities). Finally, we pass the raw text to <strong>Groq (LLaMA-3)</strong>. Groq acts as a smart parser to clean and structure the data into a strict JSON format (Skills, Experience, Projects). We force the LLM to provide exact evidence from the CV to prevent hallucinations.
+              </p>
+            </div>
+            
+            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold">2</div>
+                <h3 className="text-xl font-bold text-slate-900">Career Classification (DistilBERT)</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed">
+                While Groq extracts your details, the raw text is also sent to our custom fine-tuned <strong>DistilBERT</strong> model. This model has been trained on thousands of resumes to predict your overarching career category (e.g., Data Science, Software Engineering) with high accuracy, establishing your primary professional identity.
+              </p>
+            </div>
+
+            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 md:col-span-2">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold">3</div>
+                <h3 className="text-xl font-bold text-slate-900">Semantic Matching Engine (SentenceTransformers)</h3>
+              </div>
+              <p className="text-slate-600 leading-relaxed">
+                Once we have your structured profile, we use <strong>all-MiniLM-L6-v2</strong> to convert your skills, projects, and titles into mathematical vectors (embeddings). We calculate a multi-factor score (Skill Match, Project Match, Title Fit) by comparing your embeddings against our Career Taxonomy prototypes. Finally, we run K-Nearest Neighbors (KNN) to find other resumes similar to yours, giving you a completely explainable and precise career map.
+              </p>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>
