@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Sparkles, Navigation, CheckCircle2, ChevronRight, Activity, Users, AlertCircle } from "lucide-react";
+import { Sparkles, Navigation, CheckCircle2, ChevronRight, Activity, Users, AlertCircle, Compass } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCandidate } from "@/lib/store/CandidateStore";
+import CareerChatbot from "@/components/CareerChatbot";
 
 export default function CareerResults() {
   const { profile, isHydrated } = useCandidate();
@@ -253,6 +254,12 @@ export default function CareerResults() {
           View Extracted Profile <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
+
+      {/* Floating AI Career Advisor Chatbot */}
+      <CareerChatbot 
+        candidateProfile={profile} 
+        topCareers={engine.career_fit || []} 
+      />
     </div>
   );
 }

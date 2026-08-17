@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Briefcase, GraduationCap, Map, FolderGit2, Award, ChevronRight, Fingerprint, Sparkles, ServerCrash, CheckCircle2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCandidate } from "@/lib/store/CandidateStore";
+import CareerChatbot from "@/components/CareerChatbot";
 
 export default function ProfileCard() {
   const { profile, isHydrated } = useCandidate();
@@ -216,6 +217,9 @@ export default function ProfileCard() {
         </div>
 
       </div>
+
+      {/* Floating AI Career Advisor Chatbot */}
+      <CareerChatbot candidateProfile={profile} />
     </div>
   );
 }
