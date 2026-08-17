@@ -12,9 +12,10 @@ SECTION_PATTERNS = {
     "EXPERIENCE": r'(?:^|\n)(?:\d+\.\s*)?(?:work\s+|professional\s+|employment\s+)?(?:experience|history|employment|work\s+history|career\s+history)\b[:\s]*',
     "EDUCATION": r'(?:^|\n)(?:\d+\.\s*)?(?:education|academic\s+background|qualifications|academic\s+history)\b[:\s]*',
     "PROJECTS": r'(?:^|\n)(?:\d+\.\s*)?(?:key\s+|technical\s+|academic\s+|personal\s+)?(?:projects|portfolio|open\s+source|work\s+samples)\b[:\s]*',
-    "CERTIFICATIONS": r'(?:^|\n)(?:\d+\.\s*)?(?:certifications|certificates|licenses|courses|accreditations)(?:\s*&\s*activities)?\b[:\s]*',
+    "CERTIFICATIONS": r'(?:^|\n)(?:\d+\.\s*)?(?:certifications|certificates|licenses|courses|accreditations|training|certificates\s*&\s*courses)(?:\s*&\s*activities)?\b[:\s]*',
     "LANGUAGES": r'(?:^|\n)(?:\d+\.\s*)?(?:languages|language\s+proficiency|language\s+skills)\b[:\s]*',
-    "ACTIVITIES": r'(?:^|\n)(?:\d+\.\s*)?(?:activities|extracurricular|volunteering|community|honors|awards|achievements)\b[:\s]*'
+    "ACTIVITIES": r'(?:^|\n)(?:\d+\.\s*)?(?:activities|extracurricular|volunteering|community|honors|awards|achievements)\b[:\s]*',
+    "CONTACT": r'(?:^|\n)(?:\d+\.\s*)?(?:contact\s+info|contact\s+information|contact|personal\s+details|personal\s+info|location)\b[:\s]*'
 }
 
 def clean_text(text: str) -> str:

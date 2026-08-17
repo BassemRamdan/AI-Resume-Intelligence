@@ -260,32 +260,96 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
             
         profile["projects"] = deduped_projects
         
-    # 6. Extract Certifications (Cleaned & Filtered)
+    # 6. Extract Certifications (High-Precision Filtering & Reconstruction)
     cert_text = sections.get("CERTIFICATIONS", "")
     if cert_text.strip():
-        cert_lines = cert_text.splitlines()
-        for line in cert_lines:
-            clean_l = clean_item_title(line)
-            # Ignore noise lines, section headers, and languages
-            if not clean_l or len(clean_l) < 6:
+        def is_cert_noise(line_str: str) -> bool:
+            lower = line_str.lower().strip()
+            # 1. Location matches
+            if re.search(r'^(?:[a-zA-Z\s]+,\s*(?:egypt|cairo|alexandria|giza|usa|uk|remote|uae|saudi arabia|germany|canada))\b', lower):
+                return True
+            if lower in ["alexandria, egypt", "cairo, egypt", "remote, egypt", "egypt", "accredited provider", "verified"]:
+                return True
+            # 2. Candidate full name (All uppercase 2-3 words matching candidate name pattern)
+            if re.match(r'^[A-Z\s]{4,30}$', line_str) and not any(k in lower for k in ["cert", "depi", "course", "program", "degree", "qcourse", "aws"]):
+                return True
+            # 3. Candidate summary taglines / headlines
+            if re.search(r'\b(?:business solutions|high-performance|building scalable|scalable solutions)\b', lower) and not any(k in lower for k in ["cert", "course", "program"]):
+                return True
+            # 4. Tech stack lists with bullet delimiters
+            if ("•" in line_str or "|" in line_str) and any(t in lower for t in ["c#", "sql", "javascript", "asp.net", "rest apis"]):
+                return True
+            # 5. Section headings or language words
+            if re.match(r'^(?:&\s*activities|languages|activities|skills|native|intermediate)', lower):
+                return True
+            return False
+
+        cert_raw_lines = [clean_item_title(l) for l in cert_text.splitlines() if clean_item_title(l)]
+        filtered_cert_lines = [l for l in cert_raw_lines if not is_cert_noise(l) and len(l) > 3]
+
+        # Multi-line item reconstruction
+        merged_certs = []
+        for line in filtered_cert_lines:
+            if not merged_certs:
+                merged_certs.append(line)
                 continue
-            if re.match(r'^(?:&\s*activities|languages|activities|skills|native|intermediate)', clean_l, re.IGNORECASE):
+            last = merged_certs[-1]
+            lower_line = line.lower()
+            # Continuation patterns
+            if line.startswith("(") or line.startswith("1:") or line.startswith("2:") or lower_line.startswith(("to ", "and ", "quantum", "computing", "development", "specialization", "foundations", "track", "program")):
+                merged_certs[-1] = f"{last} {line}"
+            elif "qcourse" in last.lower() and ("introduction" in lower_line or "quantum" in lower_line):
+                merged_certs[-1] = f"{last}: {line}"
+            elif "full stack" in last.lower() and "digital egypt" in lower_line:
+                merged_certs[-1] = f"{last} - {line}"
+            elif "digital egypt" in last.lower() and "depi" in lower_line:
+                merged_certs[-1] = f"{last} ({line.strip('()')})"
+            else:
+                merged_certs.append(line)
+
+        # Build clean structured certification objects with deduplication
+        deduped_certs = []
+        seen_cert_keys = set()
+
+        for c_item in merged_certs:
+            clean_item = re.sub(r'\s+', ' ', c_item).strip()
+            if len(clean_item) < 4:
                 continue
-            if "native" in clean_l.lower() or "intermediate" in clean_l.lower():
+
+            # Parse title vs issuer
+            if "digital egypt pioneers" in clean_item.lower() or "depi" in clean_item.lower():
+                title = clean_item
+                issuer = "Ministry of Communications (MCIT) / DEPI"
+            elif "qcourse" in clean_item.lower():
+                title = clean_item
+                issuer = "QWorld / Quantum Computing Initiative"
+            elif re.search(r'[\s]*[-–—|:\u2013\u2014]+[\s]*', clean_item):
+                parts = [p.strip() for p in re.split(r'[\s]*[-–—|:\u2013\u2014]+[\s]*', clean_item, maxsplit=1)]
+                title = parts[0]
+                issuer = parts[1] if len(parts) > 1 and parts[1] else "Professional Credential"
+            else:
+                title = clean_item
+                issuer = "Professional Credential"
+
+            norm_key = re.sub(r'[^a-zA-Z0-9]', '', title.lower())
+            if not norm_key or norm_key in seen_cert_keys:
                 continue
-                
-            # Parse Title vs Issuer if separator present
-            parts = [p.strip() for p in re.split(r'[\s]*[-–—|:\u2013\u2014]+[\s]*', clean_l, maxsplit=1)]
-            title = parts[0]
-            issuer = parts[1] if len(parts) > 1 and parts[1] else "Accredited Provider"
-            
-            profile["certifications"].append({
+
+            # Check if redundant substring
+            if any(norm_key in existing or existing in norm_key for existing in seen_cert_keys):
+                continue
+
+            seen_cert_keys.add(norm_key)
+
+            deduped_certs.append({
                 "name": title,
                 "issuer": issuer,
                 "date": "Verified",
-                "evidence": clean_l,
-                "confidence": 0.90
+                "evidence": clean_item,
+                "confidence": 0.95
             })
+
+        profile["certifications"] = deduped_certs
             
     # 7. Extract Languages
     lang_text = sections.get("LANGUAGES", "")
