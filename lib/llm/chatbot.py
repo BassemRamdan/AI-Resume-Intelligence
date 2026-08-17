@@ -8,11 +8,12 @@ import os
 import re
 import json
 import requests
-from dotenv import load_dotenv
-
-# Ensure local environment variables are loaded
-load_dotenv(".env.local")
-load_dotenv(".env")
+try:
+    from dotenv import load_dotenv
+    load_dotenv(".env.local")
+    load_dotenv(".env")
+except ImportError:
+    pass
 
 from .prompts import get_prompt
 from ..career.taxonomy import CAREER_TAXONOMY, get_career_roadmap

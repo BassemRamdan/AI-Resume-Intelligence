@@ -7,11 +7,12 @@ deterministic career fit mapping, and interactive AI Career Advisor chatbot.
 import os
 import shutil
 import tempfile
-from dotenv import load_dotenv
-
-# Load local environment variables (Groq API Key, AI service URLs)
-load_dotenv(".env.local")
-load_dotenv(".env")
+try:
+    from dotenv import load_dotenv
+    load_dotenv(".env.local")
+    load_dotenv(".env")
+except ImportError:
+    pass
 from contextlib import asynccontextmanager
 from typing import Optional, List
 from fastapi import FastAPI, UploadFile, File, HTTPException
