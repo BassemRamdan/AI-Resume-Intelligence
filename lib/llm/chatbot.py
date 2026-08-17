@@ -1,7 +1,7 @@
 """
 AI Career Advisor Chatbot Service.
 Equipped with dense semantic RAG over the Career Roadmaps Knowledge Base.
-Integrates Groq API with dynamic conversational intelligence and fallback.
+Powered by Groq 120B Flagship Model with dynamic conversational intelligence.
 """
 
 import os
@@ -19,6 +19,7 @@ from ..career.taxonomy import CAREER_TAXONOMY, get_career_roadmap
 from ..career.rag import retrieve_roadmap_context
 
 GROQ_MODELS = [
+    "openai/gpt-oss-120b",
     "allam-2-7b",
     "qwen/qwen3.6-27b"
 ]
@@ -29,48 +30,6 @@ def generate_deterministic_advice(user_query: str, candidate_profile: dict, targ
     skills = [s.get("name", "") for s in candidate_profile.get("skills", [])]
     projects = [p.get("name", "") for p in candidate_profile.get("projects", [])]
     
-    # Check if user is asking about a specific technical concept (e.g. "what is docker", "explain kubernetes", "what is CI/CD")
-    if "docker" in query_lower:
-        return """### 🐳 Understanding Docker in Modern Engineering
-
-**Docker** is an open-source containerization platform that packages applications and all their dependencies (code, runtime, system libraries, configuration) into lightweight, portable, self-contained units called **Containers**.
-
----
-
-#### 🔑 Key Concepts:
-- **Dockerfile:** A text blueprint containing sequential instructions to assemble a Docker image.
-- **Docker Image:** An immutable, read-only template used to instantiate runtime containers.
-- **Docker Container:** A running, isolated instance of an image executing in user-space.
-- **Docker Compose:** A tool for defining and running multi-container applications with shared networking and volumes.
-
----
-
-#### 💡 Why It Matters for Your Career:
-- **Environment Consistency:** Eliminates the classic *"it works on my machine"* deployment bug.
-- **Microservices & Cloud Portability:** Essential prerequisite for deploying to AWS ECS, Azure Container Apps, and Kubernetes.
-- **Portfolio Recommendation:** Containerize your existing projects (`ChatApp`, `Ecom-App`, or backend APIs) using a `Dockerfile` and `docker-compose.yml` to showcase production readiness to recruiters.
-"""
-
-    if "kubernetes" in query_lower or "k8s" in query_lower:
-        return """### ☸️ Understanding Kubernetes (K8s)
-
-**Kubernetes** is an enterprise container orchestration system designed to automate the deployment, scaling, load balancing, and management of containerized applications across clusters of host machines.
-
----
-
-#### 🔑 Core Architecture:
-- **Pods:** The smallest deployable computing units running one or more co-located containers.
-- **Deployments & ReplicaSets:** Manages declarative rolling updates and self-healing replicas.
-- **Services & Ingress:** Exposes Pods to internal cluster traffic or external internet routing with load balancing.
-- **ConfigMaps & Secrets:** Decouples configuration and credentials from container images.
-
----
-
-#### 🎯 Career Roadmap Recommendation:
-Start by mastering Docker, then install **Minikube** or **k3s** locally, write YAML deployment manifests, and consider studying for the **Certified Kubernetes Administrator (CKA)** certification.
-"""
-
-    # If general roadmap / skill gap request:
     if not target_career:
         target_career = "Software Engineer"
         for c_name in CAREER_TAXONOMY.keys():
@@ -84,6 +43,64 @@ Start by mastering Docker, then install **Minikube** or **k3s** locally, write Y
     missing = [r for r in req_skills if not any(r.lower() == s.lower() for s in skills)]
     roadmap = get_career_roadmap(target_career)
     
+    # Specific concept breakdowns
+    if "python" in query_lower:
+        return f"""### 🐍 Mastering Python for {target_career}
+
+**Python** is the industry standard for backend development, data engineering, and machine learning.
+
+---
+
+#### 🗺️ Recommended Learning Roadmap:
+1. **Core Foundations (Weeks 1-3):** Syntax, Data Structures (Lists, Dicts, Sets), OOP, Generators, Context Managers.
+2. **Modern Tooling & Frameworks (Weeks 4-6):** FastAPI, AsyncIO, Type Hints (Pydantic), SQLAlchemy / Tortoise ORM.
+3. **Applied Production Project (Weeks 7-9):** Build a high-throughput REST API with automated unit testing (PyTest) and Docker containerization.
+4. **Cloud & Deployment (Weeks 10-12):** Deploy to AWS/Azure with CI/CD and Redis caching.
+
+---
+
+#### 💡 Integration with Your Profile:
+Your profile demonstrates existing strengths in **{', '.join(skills[:3]) if skills else 'Software Engineering'}**. Learning Python will allow you to build cross-stack microservices and AI-driven APIs.
+"""
+
+    if "c#" in query_lower or "csharp" in query_lower:
+        return f"""### 🔷 Mastering C# & .NET Core for {target_career}
+
+**C# and .NET** power enterprise architectures, high-performance backends, cloud microservices, and distributed systems.
+
+---
+
+#### 🗺️ Recommended Learning Path:
+1. **Language Mastery (Weeks 1-3):** Modern C# 12 features, LINQ, Generics, Async/Await, Memory Management (Garbage Collection & Structs).
+2. **Enterprise Architecture (Weeks 4-6):** ASP.NET Core Web APIs, Entity Framework Core, Clean Architecture / CQRS with MediatR.
+3. **Distributed Systems & Real-Time (Weeks 7-9):** SignalR WebSockets, Redis distributed caching, RabbitMQ message queues.
+4. **Production Readiness (Weeks 10-12):** xUnit testing, Docker multi-stage builds, Azure DevOps CI/CD.
+
+---
+
+#### 💡 Profile Synergy:
+Your profile already shows familiarity with **{', '.join(skills) if skills else 'Modern Technologies'}**. Double down on Clean Architecture and Microservices to qualify for Senior .NET Engineer roles.
+"""
+
+    if "docker" in query_lower:
+        return """### 🐳 Understanding Docker in Modern Engineering
+
+**Docker** is an open-source containerization platform that packages applications and all their dependencies into lightweight, portable, self-contained units called **Containers**.
+
+---
+
+#### 🔑 Key Concepts:
+- **Dockerfile:** A text blueprint containing sequential instructions to assemble a Docker image.
+- **Docker Image:** An immutable, read-only template used to instantiate runtime containers.
+- **Docker Container:** A running, isolated instance of an image executing in user-space.
+- **Docker Compose:** A tool for defining and running multi-container applications with shared networking and volumes.
+
+---
+
+#### 💡 Portfolio Action Item:
+Containerize your existing projects using a multi-stage `Dockerfile` and `docker-compose.yml` to prove production readiness.
+"""
+
     response = f"""### 🎯 Personalized Career Growth Roadmap: **{target_career}**
 
 ---
@@ -182,16 +199,21 @@ RETRIEVED EXPERT RAG KNOWLEDGE BASE CHUNKS:
                 json={
                     "model": model_name,
                     "messages": full_messages,
-                    "temperature": 0.3,
-                    "max_tokens": 1200
+                    "temperature": 0.35,
+                    "max_tokens": 1800
                 },
-                timeout=12
+                timeout=18
             )
             if res.status_code == 200:
                 data = res.json()
                 content = data["choices"][0]["message"]["content"]
                 if content and len(content.strip()) > 10:
+                    # Strip any internal think tags cleanly
                     clean_content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+                    if '<think>' in clean_content:
+                        clean_content = re.sub(r'<think>.*', '', clean_content, flags=re.DOTALL).strip()
+                    if not clean_content and '</think>' in content:
+                        clean_content = content.split('</think>')[-1].strip()
                     return clean_content if clean_content else content.strip()
         except Exception as e:
             print(f"Chatbot model {model_name} error: {e}")
