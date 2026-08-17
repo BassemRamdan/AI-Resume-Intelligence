@@ -8,7 +8,7 @@ export class GroqProvider implements GenerativeAIProvider {
   constructor() {
     // Requires GROQ_API_KEY to be set in environment
     this.client = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
-    this.model = process.env.GROQ_MODEL || 'llama-3.1-8b-instant';
+    this.model = 'allam-2-7b';
   }
 
   async cleanProfile(rawProfile: any): Promise<any> {
@@ -39,7 +39,7 @@ Return a strict JSON object following this exact schema:
   }
 
   async explainCareerSimilarity(similarityData: any): Promise<any> {
-     const prompt = `
+    const prompt = `
 You are CareerLens AI, an expert career analyst.
 The machine learning pipeline has evaluated the candidate's career fit using a deterministic engine with strict percentages.
 Your job is to provide a grounded explanation for WHY the candidate matches the Top Career Fits based ONLY on the evidence provided in the JSON.
@@ -65,7 +65,26 @@ Return a strict JSON object with this schema:
   "similar_profiles_analysis": "A 1-2 sentence summary explaining the KNN semantic similarity peer group."
 }
 `;
-    return this.callGroq(prompt);
+    try {
+      return await this.callGroq(prompt);
+    } catch (e) {
+      console.warn("Groq failed, falling back to deterministic explanation generation:", e);
+      // Fallback deterministic response so the UI NEVER breaks
+      const primaryCat = similarityData?.classification?.category || "General";
+      const fitList = similarityData?.career_fit || [];
+      return {
+        classification_analysis: `Primary classification signal indicates highest compatibility with ${primaryCat}.`,
+        top_careers: fitList.slice(0, 3).map((m: any) => ({
+          career: m.career,
+          total_fit: m.total_fit,
+          why: `Calculated ${m.total_fit}% deterministic fit based on verified skills (${m.evidence?.matched_skills?.join(', ') || 'strong foundational skills'}), experience match, and domain similarity.`,
+          missing_evidence: m.evidence?.missing_skills?.length > 0 
+            ? `Recommended development in: ${m.evidence.missing_skills.slice(0, 3).join(', ')}.`
+            : "Strong direct alignment with core requirements."
+        })),
+        similar_profiles_analysis: "Semantic similarity peer group calculated via KNN embeddings comparison against benchmark profiles."
+      };
+    }
   }
 
   private async callGroq(prompt: string): Promise<any> {
@@ -73,22 +92,25 @@ Return a strict JSON object with this schema:
       throw new Error("GROQ_API_KEY is not configured.");
     }
     
-    try {
-      const chatCompletion = await this.client.chat.completions.create({
-        messages: [{ role: "user", content: prompt }],
-        model: this.model,
-        response_format: { type: "json_object" },
-        temperature: 0.2,
-      });
+    const candidateModels = ['allam-2-7b', 'qwen/qwen3.6-27b'];
+    
+    for (const model of candidateModels) {
+      try {
+        const chatCompletion = await this.client.chat.completions.create({
+          messages: [{ role: "user", content: prompt }],
+          model: model,
+          response_format: { type: "json_object" },
+          temperature: 0.2,
+        });
 
-      const content = chatCompletion.choices[0]?.message?.content;
-      if (!content) {
-        throw new Error("Empty response from Groq");
+        const content = chatCompletion.choices[0]?.message?.content;
+        if (content) {
+          return JSON.parse(content);
+        }
+      } catch (error: any) {
+        console.error(`Groq error with model ${model}:`, error?.message || error);
       }
-      return JSON.parse(content);
-    } catch (error: any) {
-      console.error("Groq Generation Error:", error);
-      throw new Error("Failed to generate AI reasoning.");
     }
+    throw new Error("Failed to generate AI reasoning with available models.");
   }
 }

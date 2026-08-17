@@ -1,62 +1,101 @@
-# CareerLens AI - Intelligent Resume Analyzer
+# CareerLens AI — AI-Driven Resume Intelligence & Career Recommendation System
 
-CareerLens AI is an advanced, production-ready AI pipeline for resume parsing, career classification, and semantic matching. Built to handle real-world parsing challenges with zero hallucination.
+CareerLens AI is an academic and production-ready AI pipeline for resume parsing, career domain sequence classification, and deterministic multi-signal career recommendation with zero hallucination.
 
-## Core Features
+> [!NOTE]
+> CareerLens AI is an **Intelligence & Career Recommendation Engine**, not a job-search or vacancy-matching board.
 
-- **Deterministic Entity Extraction**: Uses `PyMuPDF` for structural layout parsing and `GLiNER` (Named Entity Recognition) to explicitly extract skills, projects, and experiences without the hallucination risks of traditional LLMs.
-- **Career Classification**: Employs a fine-tuned `DeBERTa`/`DistilBERT` model on thousands of resumes to predict the primary career category with high confidence.
-- **Semantic Job Matching**: Leverages `SentenceTransformers` (`all-MiniLM-L6-v2`) to compute cosine similarity between the candidate's skills/projects and 24 distinct career prototypes.
-- **Explainable AI (XAI)**: Breaks down the matching score mathematically (Skills 35%, Projects 20%, Semantic 20%, Education 10%, Experience 10%, Class 5%) for complete transparency.
-- **Grounded Verification**: Uses `Groq (LLaMA-3.1)` solely as a JSON formatter and evidence validator, strictly preventing data fabrication.
+---
 
-## Architecture & Pipeline
+## 🏛️ Pipeline Architecture
 
-1. **Upload & Parse**: `lib/resume.py` segments the PDF to avoid cross-section entity bleed (e.g., preventing a header name from being classified as a project).
-2. **Entity Extraction**: `GLiNER` extracts technical skills and project details deterministically.
-3. **Classification**: `lib/classifier.py` runs the extracted text through DistilBERT to get a structural career signal.
-4. **Formatting**: `lib/providers/GroqProvider.ts` forces the extracted data into a strictly typed JSON profile, checking against raw text evidence.
-5. **Matching**: `lib/similarity.py` calculates the exact fit percentage and generates actionable career roadmaps.
+```
+Resume PDF
+  → PyMuPDF Computer Vision Layout Parsing & Text Extraction
+  → Heuristic Section Segmentation
+  → Zero-Shot Entity Extraction (GLiNER: urchade/gliner_multi-v2.1)
+  → Skill Ontology Normalization
+  → Structured Candidate Profile (Preserving ALL Projects)
+  → Sequence Classification (24-Category Transformer, Test Accuracy: 83.83%, Macro F1: 76.41%)
+  → Dense Semantic Encoding (sentence-transformers/all-MiniLM-L6-v2, 384-d)
+  → KNN Similar Candidate Benchmarking (data/embeddings.npy: 2,466 x 384)
+  → Grounded Career Knowledge Base Taxonomy
+  → Multi-Signal Deterministic Career Fit Engine + Relevance Gate
+  → Evidence-Backed Groq Natural Language Explanations
+```
 
-## Getting Started
+---
 
-### Prerequisites
-- Python 3.9+
-- Node.js 18+
-- Groq API Key
+## 🎯 Deterministic Career Fit Formula
 
-### Installation
+Career recommendation is calculated mathematically using verified evidence:
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repo-url>
-   cd AI-Resume-Intelligence
-   ```
+$$\text{Career Fit} = 0.35 \times \text{Skill Match} + 0.20 \times \text{Project Match} + 0.20 \times \text{Semantic Match} + 0.10 \times \text{Education Match} + 0.10 \times \text{Experience Match} + 0.05 \times \text{Classification Signal}$$
 
-2. **Backend Setup:**
-   ```bash
-   pip install -r requirements.txt
-   python main.py
-   ```
+### Anti-Hallucination Relevance Gate
+If a candidate has 0% direct skill match and 0% project match in a target domain, the semantic score is heavily penalized to prevent unrelated career recommendations.
 
-3. **Frontend Setup:**
-   ```bash
-   npm install
-   npm run dev
-   ```
+---
 
-4. **Environment Variables:**
-   Create a `.env` file in the root directory:
-   ```env
-   GROQ_API_KEY=your_api_key_here
-   ```
+## 📚 5 Canonical Research Notebooks
 
-## Repository Structure
+| Notebook | Purpose | Verified Metrics & Assets |
+| :--- | :--- | :--- |
+| **`notebooks/01_EDA.ipynb`** | Dataset Audit & Exploratory Data Analysis | 2,484 resumes across 24 categories from `BassemRamdan/data` |
+| **`notebooks/02_Preprocessing_and_NLP.ipynb`** | PDF Extraction, Segmentation & Zero-Shot NER | Generates `data/processed_resumes.csv` (2,466 records) |
+| **`notebooks/03_Classification.ipynb`** | Baselines vs Transformer Fine-Tuning | Test Acc: **83.83%**, Macro F1: **76.41%** (N=371 test split) |
+| **`notebooks/04_Embeddings_and_Similarity.ipynb`** | Dense Semantic Encoding & Prototypes | `data/embeddings.npy` (2,466 x 384) & 24 prototypes |
+| **`notebooks/05_Career_Knowledge_Base_and_Fit.ipynb`** | Knowledge Base & Deterministic Fit Engine | 6-Signal formula, Relevance Gate & Case Studies |
 
-- `/app`: Next.js 14 frontend (App Router) with Tailwind CSS.
-- `/lib`: Core Python ML pipeline (`resume.py`, `classifier.py`, `similarity.py`).
-- `/notebooks`: Research and Development notebooks containing EDA, data preprocessing, and model fine-tuning.
+---
 
-## Design Philosophy
+## 📂 Repository Structure
 
-The system was designed with **Anti-Hallucination** as its core principle. By chaining traditional deterministic ML models (GLiNER, DistilBERT) with LLM formatters (Groq), we achieve sub-second latency while guaranteeing 100% evidence-backed data extraction.
+```
+CareerLens-AI/
+├── app/                           # Next.js 16 App Router (/upload, /profile, /careers)
+├── components/                    # React UI Components (ProfileCard, CareerResults, ResumeUpload)
+├── data/
+│   ├── metadata.csv               # 2,484 stratified split metadata
+│   ├── processed_resumes.csv      # 2,466 processed resumes dataset
+│   ├── embeddings.npy             # (2466, 384) dense semantic vectors
+│   ├── prototypes.json            # 24 category prototype centroid vectors
+│   └── cv_metadata.json           # 2,466 indexed resume summaries
+├── lib/
+│   ├── resume/                    # Layout extraction, segmentation, GLiNER, ontology
+│   ├── models/                    # Cached Sequence Classifier & SentenceTransformer
+│   ├── career/                    # Career taxonomy & deterministic fit engine
+│   └── llm/                       # Grounded Groq explanation generator & fallback
+├── models/
+│   └── distilbert-resume-classifier/ # Fine-tuned 24-category sequence classifier
+├── notebooks/                     # The 5 canonical academic notebooks
+├── prompts/                       # Dedicated anti-hallucination prompt templates
+├── main.py                        # Persistent FastAPI backend service
+├── requirements.txt
+└── package.json
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1. Backend Setup (FastAPI)
+```bash
+pip install -r requirements.txt
+python main.py
+```
+FastAPI server will preload models and start on `http://127.0.0.1:8000`.
+
+### 2. Frontend Setup (Next.js)
+```bash
+npm install
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### 3. Environment Variables
+Ensure `.env.local` exists in root:
+```env
+GROQ_API_KEY=your_groq_api_key
+AI_SERVICE_URL=http://127.0.0.1:8000
+```

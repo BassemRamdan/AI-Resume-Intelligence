@@ -56,10 +56,8 @@ export class RemoteResumeProvider implements ResumeAnalysisProvider {
 
     const rawProfile = await response.json();
     
-    // Clean with Groq just like LocalResumeProvider
-    const { GroqProvider } = require("./GroqProvider");
-    const groq = new GroqProvider();
-    const cleanedProfile = await groq.cleanProfile(rawProfile);
+    // Clean with Groq is skipped because the models on this tenant drop nested arrays
+    const cleanedProfile = rawProfile;
     
     // Inject deterministic fields back
     if (rawProfile.career_signal) {

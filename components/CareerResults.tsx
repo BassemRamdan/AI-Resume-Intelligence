@@ -155,21 +155,24 @@ export default function CareerResults() {
           </h3>
           
           <div className="space-y-6">
-            {analysis.top_careers?.map((careerData: any, idx: number) => {
-              // Find matching deterministic data from the engine
-              const engineData = engine.career_fit?.find((c:any) => c.career === careerData.career) || {
-                total_fit: 0,
-                breakdown: { skill_match: 0, project_match: 0, semantic_match: 0, education_match: 0, experience_match: 0, classification_signal: 0 },
-                evidence: { matched_skills: [], missing_skills: [], matched_projects: [] }
+            {(engine.career_fit || []).slice(0, 3).map((engineData: any, idx: number) => {
+              // Find matching explanation from AI analysis, or fallback to sensible default
+              const aiExplanation = analysis.top_careers?.find((c: any) => c.career === engineData.career) || {
+                career: engineData.career,
+                why: `Evaluated with ${engineData.total_fit}% compatibility based on detected core skills, experience, and domain classification.`,
+                missing_evidence: engineData.evidence?.missing_skills?.length > 0 
+                  ? `Key areas for growth: ${engineData.evidence.missing_skills.slice(0, 3).join(', ')}.`
+                  : "Strong overall match."
               };
               
-              const numericScore = engineData.total_fit;
+              const numericScore = engineData.total_fit || 0;
+              const careerName = engineData.career;
               
               return (
                 <div key={idx} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow group">
                   <div className="flex flex-wrap md:flex-nowrap justify-between items-start mb-3 gap-4">
                     <div className="flex-1">
-                       <h4 className="text-2xl font-bold text-slate-900">{careerData.career}</h4>
+                       <h4 className="text-2xl font-bold text-slate-900">{careerName}</h4>
                     </div>
                     <div className="flex flex-col items-end">
                        <span className="text-3xl font-black text-indigo-600">{numericScore.toFixed(1)}%</span>
@@ -214,11 +217,11 @@ export default function CareerResults() {
                   </div>
 
                   <p className="text-slate-600 text-sm mb-4 leading-relaxed font-medium">
-                    {careerData.why}
+                    {aiExplanation.why}
                   </p>
                   
                   <p className="text-rose-600/80 text-sm mb-6 leading-relaxed bg-rose-50 p-3 rounded-lg border border-rose-100">
-                    <span className="font-bold">Missing/Weak Evidence:</span> {careerData.missing_evidence}
+                    <span className="font-bold">Missing/Weak Evidence:</span> {aiExplanation.missing_evidence}
                   </p>
 
                   <div className="bg-white border border-slate-100 rounded-xl p-4">

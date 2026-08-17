@@ -57,7 +57,7 @@ export function CandidateProvider({ children }: { children: React.ReactNode }) {
   // Route protection
   useEffect(() => {
     if (isHydrated) {
-      const protectedRoutes = ["/profile", "/careers", "/jobs", "/analyze"];
+      const protectedRoutes = ["/profile", "/careers", "/analyze"];
       if (protectedRoutes.includes(pathname) && !profile) {
         router.push("/upload");
       }
