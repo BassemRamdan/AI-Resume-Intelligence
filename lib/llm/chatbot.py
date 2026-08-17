@@ -1,7 +1,7 @@
 """
 AI Career Advisor Chatbot Service.
-Integrates Groq API with deterministic career roadmap fallback
-to provide interactive career counseling, skill gap identification, and milestone planning.
+Equipped with dense semantic RAG over the Career Roadmaps Knowledge Base.
+Integrates Groq API with deterministic English fallback.
 """
 
 import os
@@ -9,6 +9,7 @@ import json
 import requests
 from .prompts import get_prompt
 from ..career.taxonomy import CAREER_TAXONOMY, get_career_roadmap
+from ..career.rag import retrieve_roadmap_context
 
 GROQ_MODELS = [
     "allam-2-7b",
@@ -17,7 +18,7 @@ GROQ_MODELS = [
 ]
 
 def generate_deterministic_advice(user_query: str, candidate_profile: dict, target_career: str = None) -> str:
-    """Generates a structured, evidence-backed roadmap and advice when LLM is unreachable."""
+    """Generates a structured, evidence-backed English roadmap and advice when LLM is unreachable."""
     skills = [s.get("name", "") for s in candidate_profile.get("skills", [])]
     projects = [p.get("name", "") for p in candidate_profile.get("projects", [])]
     
@@ -30,72 +31,54 @@ def generate_deterministic_advice(user_query: str, candidate_profile: dict, targ
                 break
                 
     tax_info = CAREER_TAXONOMY.get(target_career, CAREER_TAXONOMY["Software Engineer"])
-    req_skills = tax_info["skills"]
+    req_skills = tax_info.get("skills", [])
     matched = [s for s in skills if any(s.lower() == r.lower() for r in req_skills)]
     missing = [r for r in req_skills if not any(r.lower() == s.lower() for s in skills)]
     roadmap = get_career_roadmap(target_career)
     
-    # Detect language (Arabic vs English)
-    is_arabic = any(ord(c) >= 0x0600 and ord(c) <= 0x06FF for c in user_query)
-    
-    if is_arabic:
-        response = f"""### 🎯 خطة التطوير المهني المخصصة لمسار: **{target_career}**
+    response = f"""### 🎯 Personalized Career Growth Roadmap: **{target_career}**
 
 ---
 
-#### 🌟 1. نقاط القوة الحالية في سيرتك الذاتية:
-- **المهارات المتطابقة:** {', '.join(matched) if matched else 'لم يتم رصد مهارات مباشرة بعد'}
-- **المشاريع المسجلة:** {', '.join(projects) if projects else 'لا توجد مشاريع مضافة'}
+#### 🌟 1. Verified Profile Strengths
+- **Matched Skills:** {', '.join(matched) if matched else 'None directly detected in current profile'}
+- **Existing Projects:** {', '.join(projects) if projects else 'No portfolio projects registered yet'}
 
 ---
 
-#### 🔍 2. الفجوة المهارية وما ينقصك للتميز:
-- **المهارات والتقنيات المستهدفة:** {', '.join(missing[:5])}
+#### 🔍 2. High-Priority Skill Gap Analysis
+The following critical competencies are required to reach full competitiveness in the **{target_career}** track:
+{chr(10).join([f"- **{s}**: High-demand standard requirement." for s in missing[:5]])}
 
 ---
 
-#### 🗺️ 3. خارطة الطريق المقترحة (Step-by-Step Roadmap):
-- **المرحلة الأولى (الأساسيات):** {roadmap.get('phase_1', '')}
-- **المرحلة الثانية (التطبيق والمشاريع):** {roadmap.get('phase_2', '')}
-- **المرحلة الثالثة (الاحتراف والإنتاج):** {roadmap.get('phase_3', '')}
+#### 🗺️ 3. Step-by-Step Milestone Roadmap
+- **Phase 1 (Foundations & Core Prerequisites):**
+  {roadmap.get('phase_1', 'Master fundamental theoretical concepts, language syntax, and development workflows.')}
+  - [ ] Study core theoretical concepts and underlying system mechanics.
+  - [ ] Solidify version control and clean coding patterns.
+
+- **Phase 2 (Applied Engineering & Must-Build Portfolio Projects):**
+  {roadmap.get('phase_2', 'Build production-ready deliverables and implement end-to-end architectural patterns.')}
+  - [ ] Build a production-grade deliverable implementing missing skills ({', '.join(missing[:3]) if missing else 'Core Architecture'}).
+  - [ ] Write automated unit/integration test suites and containerize with Docker.
+
+- **Phase 3 (Production Mastery, System Design & Leadership):**
+  {roadmap.get('phase_3', 'Master distributed architectures, cloud scalability, and cross-functional leadership.')}
+  - [ ] Complete system design assessments and high-throughput optimization.
+  - [ ] Deploy to cloud infrastructure with CI/CD and monitoring.
 
 ---
 
-#### 💡 نصيحة مهنية:
-قم ببناء مشروع متكامل يدمج المهارات الناقصة ({', '.join(missing[:3])}) وارفعه على GitHub مع توثيق احترافي (README) لتعزيز فرص قبولك.
-"""
-    else:
-        response = f"""### 🎯 Personalized Career Growth Roadmap: **{target_career}**
-
----
-
-#### 🌟 1. Current Verified Strengths:
-- **Matched Skills:** {', '.join(matched) if matched else 'None directly detected yet'}
-- **Existing Projects:** {', '.join(projects) if projects else 'No projects registered'}
-
----
-
-#### 🔍 2. Skill Gap Analysis:
-- **High-Priority Missing Skills:** {', '.join(missing[:5])}
-
----
-
-#### 🗺️ 3. Actionable Milestone Roadmap:
-- **Phase 1 (Foundations):** {roadmap.get('phase_1', '')}
-- **Phase 2 (Hands-On Projects & Tooling):** {roadmap.get('phase_2', '')}
-- **Phase 3 (Production Mastery & Leadership):** {roadmap.get('phase_3', '')}
-
----
-
-#### 💡 Pro Tip:
-Develop an end-to-end portfolio project incorporating your target skills ({', '.join(missing[:3])}) and document system architecture on GitHub to maximize recruiter impact.
+#### 💡 Actionable Engineering Pro-Tip
+Build an end-to-end portfolio project addressing your missing skills (**{', '.join(missing[:3]) if missing else 'Advanced Architecture'}**) with full documentation, architectural diagrams, and test suites on GitHub to significantly increase recruiter engagement.
 """
     return response
 
 def chat_career_advisor(messages: list, candidate_profile: dict = None, target_career: str = None) -> str:
     """
     Coordinates chat session with the AI Career Advisor.
-    Utilizes candidate profile, target career taxonomy, and Groq API with robust fallback.
+    Enforces English-only output and augments LLM context with dense semantic RAG chunks.
     """
     if not candidate_profile:
         candidate_profile = {}
@@ -106,27 +89,31 @@ def chat_career_advisor(messages: list, candidate_profile: dict = None, target_c
             last_user_message = m.get("content", "")
             break
             
+    # Retrieve top-k semantic RAG chunks from Career Roadmaps Knowledge Base
+    rag_context = retrieve_roadmap_context(last_user_message, target_career=target_career, top_k=3)
+    
     api_key = os.getenv("GROQ_API_KEY", "")
     if not api_key:
         return generate_deterministic_advice(last_user_message, candidate_profile, target_career)
         
     sys_prompt = get_prompt("chatbot")
     
-    # Build context
+    # Build candidate evidence context
     skills_str = ", ".join([s.get("name", "") for s in candidate_profile.get("skills", [])])
     projects_str = ", ".join([p.get("name", "") for p in candidate_profile.get("projects", [])])
     
     target_info = CAREER_TAXONOMY.get(target_career, {}) if target_career else {}
     req_skills = ", ".join(target_info.get("skills", []))
-    roadmap_info = json.dumps(get_career_roadmap(target_career) if target_career else {})
     
     context_str = f"""
-Candidate Verified Profile:
-- Skills: {skills_str}
-- Projects: {projects_str}
-- Target Track: {target_career or 'General Career Advisory'}
-- Target Standard Skills: {req_skills}
-- Reference Roadmap: {roadmap_info}
+CANDIDATE EVIDENCE PROFILE:
+- Extracted Skills: {skills_str or 'None detected'}
+- Extracted Projects: {projects_str or 'None detected'}
+- Target Career Track: {target_career or 'Software Engineer'}
+- Target Baseline Skills: {req_skills}
+
+RETRIEVED EXPERT RAG KNOWLEDGE BASE CHUNKS (Reference Roadmap, Project Blueprints & Senior Milestones):
+{rag_context}
 """
     
     full_messages = [
@@ -147,8 +134,8 @@ Candidate Verified Profile:
                 json={
                     "model": model_name,
                     "messages": full_messages,
-                    "temperature": 0.4,
-                    "max_tokens": 1000
+                    "temperature": 0.3,
+                    "max_tokens": 1200
                 },
                 timeout=12
             )

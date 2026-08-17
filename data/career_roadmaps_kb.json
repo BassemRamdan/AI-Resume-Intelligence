@@ -1,0 +1,2065 @@
+{
+  "INFORMATION-TECHNOLOGY": {
+    "Software Engineer": {
+      "domain": "INFORMATION-TECHNOLOGY",
+      "overview": "Designs, develops, tests, and maintains scalable software systems and distributed backend architectures.",
+      "seniority_levels": {
+        "Junior": "Proficient in 1-2 core programming languages (Python/C#/Java/TypeScript), basic Git workflows, writing unit tests, and executing bug fixes under supervision.",
+        "Mid-Level": "Independently designs RESTful APIs, optimizes relational/NoSQL database queries, implements containerization with Docker, and leads feature development.",
+        "Senior": "Architects microservices systems, establishes CI/CD pipelines, enforces clean code standards, leads system design reviews, and mentors engineering teams.",
+        "Lead/Architect": "Sets organizational tech strategy, designs fault-tolerant distributed systems, manages cloud infrastructure economics, and defines cross-team API standards."
+      },
+      "foundational_skills": [
+        "Data Structures & Algorithms",
+        "Object-Oriented Programming (OOP)",
+        "Design Patterns (SOLID)",
+        "Relational Database Design (3NF)",
+        "Operating Systems Fundamentals",
+        "Computer Networking (TCP/IP, HTTP/HTTPS, WebSockets)"
+      ],
+      "applied_tech_stack": [
+        "Python",
+        "C# / .NET Core",
+        "Java / Spring Boot",
+        "TypeScript / Node.js",
+        "PostgreSQL",
+        "Redis",
+        "Docker",
+        "Kubernetes",
+        "Kafka",
+        "Git",
+        "GitHub Actions"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Distributed Asynchronous Task Queue & Worker System",
+          "description": "A high-throughput distributed task processing queue utilizing Redis as broker, worker pools with retry mechanisms, exponential backoff, and dead-letter queues.",
+          "tech": [
+            "Python / C#",
+            "Redis",
+            "Docker",
+            "PostgreSQL",
+            "Prometheus"
+          ]
+        },
+        {
+          "title": "Real-Time Collaborative Document / Chat Engine",
+          "description": "A real-time synchronization backend featuring WebSockets, Operational Transformation (OT) or CRDTs, Redis Pub/Sub, and token-based authentication.",
+          "tech": [
+            "ASP.NET Core / Node.js",
+            "WebSockets / SignalR",
+            "Redis Pub/Sub",
+            "PostgreSQL",
+            "Docker"
+          ]
+        },
+        {
+          "title": "E-Commerce Microservices Platform with Saga Pattern",
+          "description": "An enterprise multi-service architecture including Order, Inventory, and Payment services communicating via RabbitMQ/Kafka with transactional outbox pattern.",
+          "tech": [
+            "Microservices",
+            "Docker Compose",
+            "RabbitMQ",
+            "PostgreSQL",
+            "OAuth2 / JWT"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "AWS Certified Solutions Architect - Associate",
+          "level": "Mid/Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "Certified Kubernetes Administrator (CKA)",
+          "level": "Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "Microsoft Certified: Azure Developer Associate",
+          "level": "Mid",
+          "roi": "High"
+        }
+      ],
+      "common_interview_topics": [
+        "Data Structures & LeetCode (Trees, Graphs, DP)",
+        "System Design (Rate Limiter, URL Shortener, Chat System)",
+        "Database Indexing & Sharding",
+        "Concurrency & Multithreading",
+        "Clean Architecture & Dependency Injection"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking distributed system observability (Prometheus/Grafana/OpenTelemetry).",
+        "Writing only basic CRUD without caching layers (Redis) or message queues.",
+        "Missing automated unit & integration testing test suites (xUnit/PyTest/Jest)."
+      ]
+    },
+    "Machine Learning Engineer": {
+      "domain": "INFORMATION-TECHNOLOGY",
+      "overview": "Builds, optimizes, and deploys predictive models and deep learning pipelines into high-availability production environments.",
+      "seniority_levels": {
+        "Junior": "Competent in data preprocessing, exploratory data analysis, Scikit-Learn baseline modeling, and model evaluation metrics (Precision, Recall, ROC-AUC).",
+        "Mid-Level": "Develops deep learning models (PyTorch/TensorFlow), fine-tunes pretrained Hugging Face transformers, and deploys inference endpoints via FastAPI.",
+        "Senior": "Builds end-to-end MLOps pipelines (MLflow/Kubeflow), implements model quantization (ONNX/TensorRT), monitors data drift, and designs distributed training workflows.",
+        "Lead/Architect": "Directs AI research and production strategy, optimizes multi-node GPU cluster utilization, and architects generative AI foundation model systems."
+      },
+      "foundational_skills": [
+        "Linear Algebra",
+        "Multivariable Calculus",
+        "Probability & Statistics",
+        "Optimization Algorithms (SGD, Adam)",
+        "Machine Learning Theory",
+        "Deep Learning Fundamentals (CNNs, RNNs, Transformers)"
+      ],
+      "applied_tech_stack": [
+        "Python",
+        "PyTorch",
+        "Hugging Face Transformers",
+        "Scikit-Learn",
+        "NumPy",
+        "Pandas",
+        "FastAPI",
+        "Docker",
+        "MLflow",
+        "ONNX",
+        "Triton Inference Server",
+        "PostgreSQL / Vector DBs (Milvus/Qdrant)"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production NLP Information Extraction & Entity Recognition System",
+          "description": "Zero-shot and fine-tuned Transformer model (GLiNER / DeBERTa) wrapped in a FastAPI microservice with caching, ONNX runtime optimization, and Docker deployment.",
+          "tech": [
+            "PyTorch",
+            "Hugging Face",
+            "FastAPI",
+            "ONNX",
+            "Docker"
+          ]
+        },
+        {
+          "title": "Real-Time Semantic Search & Vector RAG Pipeline",
+          "description": "Dense vector embedding retrieval system integrating SentenceTransformers, Qdrant/FAISS, and hybrid lexical/semantic ranking for intelligent document search.",
+          "tech": [
+            "SentenceTransformers",
+            "Qdrant / FAISS",
+            "Python",
+            "FastAPI",
+            "Docker"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "AWS Certified Machine Learning - Specialty",
+          "level": "Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "Google Cloud Professional Machine Learning Engineer",
+          "level": "Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "DeepLearning.AI TensorFlow / PyTorch Specializations",
+          "level": "Junior/Mid",
+          "roi": "High"
+        }
+      ],
+      "common_interview_topics": [
+        "Math derivations (Backprop, Loss functions)",
+        "Model evaluation under imbalanced data",
+        "Transformer Attention Mechanism (Self-Attention, Multi-Head)",
+        "MLOps & Model Serving Latency Optimization",
+        "Preventing Overfitting & Data Leakage"
+      ],
+      "high_value_skill_gaps": [
+        "Restricting experience to Jupyter Notebooks without deploying production APIs.",
+        "Lack of understanding of model quantization and inference speed optimization.",
+        "Neglecting data versioning (DVC) and experiment tracking (MLflow)."
+      ]
+    },
+    "Data Scientist": {
+      "domain": "INFORMATION-TECHNOLOGY",
+      "overview": "Expert career profile for Data Scientist in the INFORMATION-TECHNOLOGY industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Python",
+        "SQL",
+        "Pandas",
+        "NumPy",
+        "Scikit-Learn"
+      ],
+      "applied_tech_stack": [
+        "Python",
+        "SQL",
+        "Pandas",
+        "NumPy",
+        "Scikit-Learn",
+        "Machine Learning",
+        "Matplotlib",
+        "Seaborn",
+        "Statistical Modeling",
+        "Tableau",
+        "Power BI"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Data Scientist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in INFORMATION-TECHNOLOGY.",
+          "tech": [
+            "Python",
+            "SQL",
+            "Pandas",
+            "NumPy"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "INFORMATION-TECHNOLOGY Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced INFORMATION-TECHNOLOGY tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Data Wrangling & Stats: Advanced SQL, Pandas, EDA, Probability, Hypothesis Testing, and Data Storytelling.",
+        "phase_2": "Predictive Modeling: Supervised & unsupervised learning with Scikit-Learn, Feature Engineering, and model evaluation metrics.",
+        "phase_3": "Advanced Analytics & BI: Interactive BI dashboards (Tableau/Power BI), A/B testing frameworks, and scalable BigQuery/Spark processing."
+      }
+    },
+    "DevOps / Cloud Engineer": {
+      "domain": "INFORMATION-TECHNOLOGY",
+      "overview": "Expert career profile for DevOps / Cloud Engineer in the INFORMATION-TECHNOLOGY industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "Azure",
+        "GCP"
+      ],
+      "applied_tech_stack": [
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "Azure",
+        "GCP",
+        "CI/CD",
+        "Linux",
+        "Bash",
+        "Terraform",
+        "Git",
+        "Prometheus",
+        "Grafana"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade DevOps / Cloud Engineer Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in INFORMATION-TECHNOLOGY.",
+          "tech": [
+            "Docker",
+            "Kubernetes",
+            "AWS",
+            "Azure"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "INFORMATION-TECHNOLOGY Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced INFORMATION-TECHNOLOGY tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Linux & Networking: Advanced Linux CLI, Bash scripting, TCP/IP, DNS, SSL/TLS, and Git version control.",
+        "phase_2": "Containers & CI/CD: Docker containerization, multi-stage builds, GitHub Actions / GitLab CI pipelines, and cloud platform fundamentals (AWS/Azure).",
+        "phase_3": "Orchestration & IaC: Kubernetes cluster management (Helm), Terraform Infrastructure as Code, Prometheus/Grafana monitoring, and SRE best practices."
+      }
+    },
+    "Cybersecurity Analyst": {
+      "domain": "INFORMATION-TECHNOLOGY",
+      "overview": "Expert career profile for Cybersecurity Analyst in the INFORMATION-TECHNOLOGY industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Network Security",
+        "Penetration Testing",
+        "SIEM",
+        "Wireshark",
+        "Vulnerability Assessment"
+      ],
+      "applied_tech_stack": [
+        "Network Security",
+        "Penetration Testing",
+        "SIEM",
+        "Wireshark",
+        "Vulnerability Assessment",
+        "Firewalls",
+        "Incident Response",
+        "Linux",
+        "Python"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Cybersecurity Analyst Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in INFORMATION-TECHNOLOGY.",
+          "tech": [
+            "Network Security",
+            "Penetration Testing",
+            "SIEM",
+            "Wireshark"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "INFORMATION-TECHNOLOGY Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced INFORMATION-TECHNOLOGY tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Networking & System Security: Network protocols, Linux/Windows administration, Wireshark packet analysis, and security principles (CIA Triad).",
+        "phase_2": "Defensive Security & SOC: SIEM monitoring (Splunk/ELK), log analysis, vulnerability scanning (Nessus), and incident response procedures.",
+        "phase_3": "Offensive Security & Compliance: Penetration testing (Metasploit, Burp Suite), ISO 27001 / NIST frameworks, and certifications (CompTIA Security+, CEH, OSCP)."
+      }
+    }
+  },
+  "ACCOUNTANT": {
+    "Senior Accountant": {
+      "domain": "ACCOUNTANT",
+      "overview": "Directs financial record keeping, corporate tax preparation, statutory audit compliance, and financial statement consolidation.",
+      "seniority_levels": {
+        "Junior": "Handles daily journal entries, accounts payable/receivable (AP/AR), and bank reconciliations.",
+        "Mid-Level": "Prepares monthly/quarterly closing statements, oversees payroll, and manages corporate tax filings.",
+        "Senior": "Directs statutory audits, implements ERP systems (SAP/Oracle), manages internal controls, and consolidates multi-entity financials.",
+        "Lead/Controller": "Leads corporate financial governance, designs fiscal policy, liaises with external auditors, and reports to C-Suite/Board."
+      },
+      "foundational_skills": [
+        "Double-Entry Bookkeeping",
+        "GAAP & IFRS Standards",
+        "Financial Statement Analysis",
+        "Tax Law & Statutory Regulations",
+        "Cost Accounting",
+        "Internal Controls"
+      ],
+      "applied_tech_stack": [
+        "SAP ERP",
+        "Oracle Financials",
+        "QuickBooks",
+        "Advanced Excel (VBA/Power Query)",
+        "Xero",
+        "Power BI"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Automated Multi-Entity Financial Consolidation Model",
+          "description": "An integrated financial model consolidating balance sheets, income statements, and cash flows with automated inter-company transaction eliminations.",
+          "tech": [
+            "Advanced Excel",
+            "Power Query",
+            "GAAP Standards",
+            "VBA"
+          ]
+        },
+        {
+          "title": "Corporate Statutory Audit & Internal Control Framework",
+          "description": "A comprehensive risk-based internal auditing matrix and compliance handbook aligned with SOX / IFRS requirements.",
+          "tech": [
+            "Auditing Frameworks",
+            "Internal Controls",
+            "SAP ERP"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "Certified Public Accountant (CPA)",
+          "level": "Senior",
+          "roi": "Maximum"
+        },
+        {
+          "name": "Certified Management Accountant (CMA)",
+          "level": "Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "Association of Chartered Certified Accountants (ACCA)",
+          "level": "Senior",
+          "roi": "Maximum"
+        }
+      ],
+      "common_interview_topics": [
+        "Revenue recognition standards (IFRS 15 / ASC 606)",
+        "Lease accounting (IFRS 16)",
+        "Inter-company reconciliations",
+        "Tax dispute resolutions",
+        "ERP migration strategies"
+      ],
+      "high_value_skill_gaps": [
+        "Relying exclusively on manual spreadsheets without ERP fluency (SAP/Oracle).",
+        "Lack of experience in foreign currency translations and multi-jurisdictional tax filings."
+      ]
+    },
+    "Senior Accountant & Tax Specialist": {
+      "domain": "ACCOUNTANT",
+      "overview": "Expert career profile for Senior Accountant & Tax Specialist in the ACCOUNTANT industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "General Ledger",
+        "Auditing",
+        "Tax Preparation",
+        "Balance Sheet",
+        "Reconciliation"
+      ],
+      "applied_tech_stack": [
+        "General Ledger",
+        "Auditing",
+        "Tax Preparation",
+        "Balance Sheet",
+        "Reconciliation",
+        "QuickBooks",
+        "GAAP",
+        "Excel",
+        "Financial Reporting",
+        "ERP Systems"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Senior Accountant & Tax Specialist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in ACCOUNTANT.",
+          "tech": [
+            "General Ledger",
+            "Auditing",
+            "Tax Preparation",
+            "Balance Sheet"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "ACCOUNTANT Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced ACCOUNTANT tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Foundational Accounting: Master double-entry bookkeeping, GAAP/IFRS standards, Balance Sheets, and Advanced Excel modeling.",
+        "phase_2": "Financial Systems & Compliance: Hands-on ERP (SAP/Oracle/QuickBooks), corporate tax preparation, and internal controls.",
+        "phase_3": "Strategic Accounting & Certification: Forensic auditing, cash flow optimization, financial statement consolidation, and CPA/CMA certification."
+      }
+    }
+  },
+  "DESIGNER": {
+    "UI/UX Product Designer": {
+      "domain": "DESIGNER",
+      "overview": "Architects end-to-end digital product experiences, design systems, interactive prototypes, and usability research studies.",
+      "seniority_levels": {
+        "Junior": "Creates wireframes, low-fidelity mockups, visual UI components, and adheres to existing design guidelines.",
+        "Mid-Level": "Leads UX discovery interviews, builds comprehensive Figma design systems with auto-layout and component variables, and conducts usability testing.",
+        "Senior": "Defines product design strategy, aligns user needs with business KPIs, establishes cross-platform design tokens, and collaborates with frontend engineers.",
+        "Lead/Head of Design": "Builds and mentors design teams, establishes design culture, drives product vision, and manages design operations (DesignOps)."
+      },
+      "foundational_skills": [
+        "User-Centered Design (UCD)",
+        "Information Architecture",
+        "Visual Hierarchy & Typography",
+        "Color Theory",
+        "Accessibility Standards (WCAG 2.1 AA)",
+        "Qualitative & Quantitative User Research"
+      ],
+      "applied_tech_stack": [
+        "Figma",
+        "Adobe XD",
+        "Miro",
+        "Protopie",
+        "Design Systems",
+        "HTML/CSS Basics",
+        "Storybook",
+        "UserTesting",
+        "Hotjar"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Enterprise Design System with Multi-Brand Tokens",
+          "description": "A complete, scalable design system in Figma featuring components, auto-layout variants, interactive states, dark mode support, and design token documentation.",
+          "tech": [
+            "Figma",
+            "Design Tokens",
+            "WCAG Accessibility",
+            "Storybook Integration"
+          ]
+        },
+        {
+          "title": "Data-Driven SaaS Dashboard Redesign & Usability Study",
+          "description": "End-to-end UX case study including user interviews, heuristic evaluation, persona creation, interactive Figma prototyping, and measurable SUS score improvement.",
+          "tech": [
+            "Figma",
+            "User Research",
+            "Usability Testing",
+            "Miro"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "Google UX Design Professional Certificate",
+          "level": "Junior/Mid",
+          "roi": "High"
+        },
+        {
+          "name": "Nielsen Norman Group (NN/g) UX Master Certified",
+          "level": "Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "Interaction Design Foundation (IxDF) Certified UX Designer",
+          "level": "Mid",
+          "roi": "High"
+        }
+      ],
+      "common_interview_topics": [
+        "Design portfolio walkthrough and trade-off rationalization",
+        "Handling conflicting user vs business requirements",
+        "Design system governance and developer handoff",
+        "Accessibility compliance strategies"
+      ],
+      "high_value_skill_gaps": [
+        "Showing only visual Dribbble mockups without UX research context or problem-solving methodologies.",
+        "Lack of interactive micro-prototyping and design token fluency."
+      ]
+    }
+  },
+  "FINANCE": {
+    "Financial Analyst": {
+      "domain": "FINANCE",
+      "overview": "Performs corporate financial forecasting, valuation modeling, capital budgeting, and investment portfolio risk analytics.",
+      "seniority_levels": {
+        "Junior": "Builds basic 3-statement models, analyzes historical financial performance, and prepares quarterly budget variances.",
+        "Mid-Level": "Develops Discounted Cash Flow (DCF) and Leveraged Buyout (LBO) valuations, conducts sensitivity analyses, and automates reporting via SQL/Python.",
+        "Senior": "Leads M&A financial due diligence, manages debt/equity financing structures, advises executive leadership, and structures investment portfolios.",
+        "Lead/Director": "Directs corporate treasury, capital allocation strategies, investor relations, and enterprise risk management."
+      },
+      "foundational_skills": [
+        "Corporate Finance Theory",
+        "Financial Statement Modeling",
+        "Valuation Methodologies (DCF, Multiples, LBO)",
+        "Time Value of Money & WACC",
+        "Capital Markets Dynamics",
+        "Risk & Return Optimization (Sharpe, VaR)"
+      ],
+      "applied_tech_stack": [
+        "Excel (Advanced Modeling)",
+        "SQL",
+        "Python (Pandas, NumPy, yfinance)",
+        "Bloomberg Terminal",
+        "FactSet",
+        "Power BI",
+        "Tableau"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Comprehensive 3-Statement & DCF Valuation Model",
+          "description": "A dynamic financial model projecting revenue drivers, working capital, debt schedules, and scenario sensitivity tables for a publicly traded company.",
+          "tech": [
+            "Financial Modeling",
+            "DCF Valuation",
+            "Excel",
+            "Sensitivity Analysis"
+          ]
+        },
+        {
+          "title": "Quantitative Portfolio Optimization & Risk Engine",
+          "description": "Python-based financial portfolio analyzer computing Modern Portfolio Theory (MPT) efficient frontiers, Value-at-Risk (VaR), and Monte Carlo simulations.",
+          "tech": [
+            "Python",
+            "Pandas",
+            "NumPy",
+            "Quantitative Finance",
+            "SQL"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "Chartered Financial Analyst (CFA)",
+          "level": "Senior",
+          "roi": "Maximum"
+        },
+        {
+          "name": "Financial Modeling & Valuation Analyst (FMVA)",
+          "level": "Junior/Mid",
+          "roi": "Very High"
+        },
+        {
+          "name": "Financial Risk Manager (FRM)",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "How the 3 financial statements link together under different accounting events",
+        "Walking through a DCF and calculating WACC",
+        "Enterprise Value vs Equity Value adjustments",
+        "Capital asset pricing model (CAPM) assumptions"
+      ],
+      "high_value_skill_gaps": [
+        "Building static spreadsheet models without dynamic scenario switches and stress testing.",
+        "Lacking modern quantitative scripting skills (SQL/Python) for handling large financial datasets."
+      ]
+    },
+    "Financial Analyst & Portfolio Specialist": {
+      "domain": "FINANCE",
+      "overview": "Expert career profile for Financial Analyst & Portfolio Specialist in the FINANCE industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Financial Modeling",
+        "Valuation",
+        "Excel",
+        "SQL",
+        "Risk Management"
+      ],
+      "applied_tech_stack": [
+        "Financial Modeling",
+        "Valuation",
+        "Excel",
+        "SQL",
+        "Risk Management",
+        "Corporate Finance",
+        "Portfolio Management",
+        "Reporting",
+        "Bloomberg Terminal"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Financial Analyst & Portfolio Specialist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in FINANCE.",
+          "tech": [
+            "Financial Modeling",
+            "Valuation",
+            "Excel",
+            "SQL"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "FINANCE Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced FINANCE tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Financial Statement Analysis: 3-statement financial modeling in Excel, DCF valuation, ratio analysis, and capital budgeting.",
+        "phase_2": "Quantitative Modeling & Risk: Statistical portfolio optimization (Sharpe Ratio/VaR), Python for financial data (yfinance/pandas), and SQL querying.",
+        "phase_3": "Investment Strategy & Advisory: Private equity / venture capital deal structuring, M&A due diligence, and CFA Charterholder track."
+      }
+    }
+  },
+  "ENGINEERING": {
+    "Mechanical & Systems Engineer": {
+      "domain": "ENGINEERING",
+      "overview": "Designs mechanical mechanisms, thermodynamic systems, structural components, and oversees manufacturing execution.",
+      "seniority_levels": {
+        "Junior": "Generates 2D/3D CAD models, creates manufacturing drawings with basic tolerances, and assists in prototype assembly.",
+        "Mid-Level": "Performs Finite Element Analysis (FEA) and Computational Fluid Dynamics (CFD), selects materials, and applies GD&T standards.",
+        "Senior": "Leads end-to-end product development (NPI), enforces DFM/DFA (Design for Manufacturing/Assembly), and resolves complex thermal/structural failures.",
+        "Lead/Chief Engineer": "Architects multidisciplinary electromechanical platforms, manages vendor tooling quality, and directs engineering compliance."
+      },
+      "foundational_skills": [
+        "Statics & Dynamics",
+        "Mechanics of Materials",
+        "Thermodynamics & Heat Transfer",
+        "Fluid Mechanics",
+        "Geometric Dimensioning and Tolerancing (GD&T ASME Y14.5)",
+        "Materials Science"
+      ],
+      "applied_tech_stack": [
+        "SolidWorks",
+        "Autodesk Inventor",
+        "CATIA",
+        "ANSYS (FEA/CFD)",
+        "MATLAB / Simulink",
+        "AutoCAD",
+        "CNC G-Code / 3D Printing"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Precision Robotic Actuator Mechanism with Thermal & Structural FEA",
+          "description": "Complete mechanical assembly CAD design with stress/deflection FEA verification in ANSYS, thermal dissipation modeling, and GD&T production drawings.",
+          "tech": [
+            "SolidWorks",
+            "ANSYS FEA",
+            "GD&T",
+            "DFM/DFA"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "Professional Engineer (PE) License",
+          "level": "Senior",
+          "roi": "Maximum"
+        },
+        {
+          "name": "Certified SolidWorks Professional (CSWP/CSWE)",
+          "level": "Mid",
+          "roi": "Very High"
+        },
+        {
+          "name": "Six Sigma Green / Black Belt (CSSGB)",
+          "level": "Senior",
+          "roi": "High"
+        }
+      ],
+      "common_interview_topics": [
+        "Interpreting GD&T feature control frames",
+        "Stress concentrations and fatigue failure modes",
+        "Material selection trade-offs (Aluminum vs Carbon Fiber vs Polymers)",
+        "Thermal resistance calculations"
+      ],
+      "high_value_skill_gaps": [
+        "Designing CAD models without considering machining constraints, draft angles, and injection molding tolerances."
+      ]
+    }
+  },
+  "BUSINESS-DEVELOPMENT": {
+    "Business Development Manager": {
+      "domain": "BUSINESS-DEVELOPMENT",
+      "overview": "Drives strategic revenue growth, B2B enterprise partnerships, commercial negotiations, and new market expansion.",
+      "seniority_levels": {
+        "Junior": "Conducts market research, generates and qualifies inbound/outbound B2B leads, and maintains CRM pipeline records.",
+        "Mid-Level": "Conducts consultative discovery calls, delivers high-stakes value presentations, and manages commercial sales cycles to close.",
+        "Senior": "Structures complex multi-year enterprise partnerships, leads revenue forecasting, and negotiates commercial contracts.",
+        "Lead/VP Growth": "Defines go-to-market (GTM) expansion, manages P&L targets, builds regional channel networks, and directs business development teams."
+      },
+      "foundational_skills": [
+        "Market Analysis (TAM/SAM/SOM)",
+        "B2B Sales Methodologies (MEDDIC/Challenger)",
+        "Financial Acumen & Commercial Deal Structuring",
+        "Contract Negotiation",
+        "Stakeholder Management"
+      ],
+      "applied_tech_stack": [
+        "Salesforce CRM",
+        "HubSpot",
+        "LinkedIn Sales Navigator",
+        "ZoomInfo",
+        "PowerPoint / Keynote",
+        "Excel Financial Modeling"
+      ],
+      "must_build_projects": [
+        {
+          "title": "B2B Market Expansion Strategy & Enterprise Partnership Pitch",
+          "description": "A comprehensive Go-to-Market (GTM) strategy analyzing competitive landscape, unit economics, partner incentive models, and contract frameworks.",
+          "tech": [
+            "Market Research",
+            "B2B Strategy",
+            "Financial Modeling",
+            "Pitch Decks"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "Certified Professional Sales Leader (CPSL)",
+          "level": "Senior",
+          "roi": "High"
+        },
+        {
+          "name": "HubSpot Inbound Sales & Sales Management Certification",
+          "level": "Junior/Mid",
+          "roi": "Medium"
+        }
+      ],
+      "common_interview_topics": [
+        "Structuring a value proposition for C-suite buyers",
+        "Overcoming enterprise procurement and legal objections",
+        "Managing revenue pipelines and quota forecasting"
+      ],
+      "high_value_skill_gaps": [
+        "Focusing on transactional selling rather than strategic, consultative partnership structuring."
+      ]
+    }
+  },
+  "HEALTHCARE": {
+    "Clinical Healthcare Professional": {
+      "domain": "HEALTHCARE",
+      "overview": "Delivers direct clinical patient care, conducts medical diagnostics, administers therapies, and ensures clinical compliance.",
+      "seniority_levels": {
+        "Junior": "Monitors patient vitals, maintains Electronic Health Records (EHR), and administers physician-prescribed treatments.",
+        "Mid-Level": "Conducts patient triaging, coordinates multidisciplinary clinical teams, and enforces infection control protocols.",
+        "Senior": "Leads specialized clinical units, manages clinical audit quality indicators, and participates in clinical research trials.",
+        "Lead/Director": "Directs hospital nursing/clinical operations, ensures healthcare accreditation standards (JCI/HIPAA), and manages clinical budgets."
+      },
+      "foundational_skills": [
+        "Anatomy & Physiology",
+        "Pathophysiology",
+        "Pharmacology & Medication Safety",
+        "Clinical Assessment & Triaging",
+        "Medical Ethics & Patient Privacy (HIPAA)",
+        "Infection Control Standards"
+      ],
+      "applied_tech_stack": [
+        "Epic Systems EHR",
+        "Cerner",
+        "Medical Diagnostics Equipment",
+        "Point of Care (POC) Testing",
+        "BLS / ACLS Protocols"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Hospital Clinical Quality Improvement & Patient Safety Protocol",
+          "description": "A standardized clinical pathway project reducing hospital-acquired infection rates and optimizing EHR documentation accuracy.",
+          "tech": [
+            "Clinical Care Protocols",
+            "Epic EHR",
+            "Patient Safety",
+            "Healthcare Quality Metrics"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "Registered Nurse (RN) / Medical Board License",
+          "level": "Required",
+          "roi": "Mandatory"
+        },
+        {
+          "name": "Advanced Cardiovascular Life Support (ACLS)",
+          "level": "Mid/Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "Certified Healthcare Quality Professional (CPHQ)",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Managing acute clinical deterioration scenarios",
+        "Medication error prevention safeguards",
+        "Ethical dilemmas and patient advocacy",
+        "EHR compliance and handover communication"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking familiarity with hospital enterprise EHR systems (Epic/Cerner) and clinical quality metrics."
+      ]
+    },
+    "Clinical Healthcare & Medical Professional": {
+      "domain": "HEALTHCARE",
+      "overview": "Expert career profile for Clinical Healthcare & Medical Professional in the HEALTHCARE industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Patient Care",
+        "Clinical Diagnosis",
+        "Medical Records (EMR/EHR)",
+        "Healthcare Compliance (HIPAA)",
+        "Pharmacology"
+      ],
+      "applied_tech_stack": [
+        "Patient Care",
+        "Clinical Diagnosis",
+        "Medical Records (EMR/EHR)",
+        "Healthcare Compliance (HIPAA)",
+        "Pharmacology",
+        "Vital Signs Monitoring",
+        "Infection Control"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Clinical Healthcare & Medical Professional Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in HEALTHCARE.",
+          "tech": [
+            "Patient Care",
+            "Clinical Diagnosis",
+            "Medical Records (EMR/EHR)",
+            "Healthcare Compliance (HIPAA)"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "HEALTHCARE Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced HEALTHCARE tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Medical Fundamentals: Human anatomy, pathophysiology, medical terminology, pharmacology, and BLS/ACLS certification.",
+        "phase_2": "Clinical Care & EMR: Patient assessment protocols, EMR documentation (Epic/Cerner), medication administration, and infection control compliance.",
+        "phase_3": "Advanced Clinical Leadership: Specialty clinical management, clinical research data collection, healthcare policy enforcement, and hospital unit leadership."
+      }
+    }
+  },
+  "HR": {
+    "Human Resources & Talent Acquisition Specialist": {
+      "domain": "HR",
+      "overview": "Directs talent sourcing, organizational culture, employee relations, labor compliance, and HRIS people operations.",
+      "seniority_levels": {
+        "Junior": "Sources candidates via Boolean search/LinkedIn, screens resumes, schedules interviews, and coordinates onboarding.",
+        "Mid-Level": "Conducts behavioral interviews, manages employee grievance resolutions, conducts salary benchmarking, and administers HRIS.",
+        "Senior": "Designs organizational talent retention programs, leads leadership succession planning, and implements enterprise HR technology.",
+        "Lead/VP People": "Shapes corporate culture, manages total rewards strategy, advises executive leadership, and aligns workforce planning with business revenue."
+      },
+      "foundational_skills": [
+        "Talent Acquisition Strategies",
+        "Employment & Labor Law Compliance",
+        "Performance Management Systems",
+        "Total Rewards & Compensation Design",
+        "Employee Engagement & Retention",
+        "Organizational Development"
+      ],
+      "applied_tech_stack": [
+        "Workday HRIS",
+        "BambooHR",
+        "Greenhouse ATS",
+        "Lever",
+        "LinkedIn Recruiter",
+        "Culture Amp",
+        "Excel Data Analysis"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Enterprise Talent Acquisition & Retention Strategy Framework",
+          "description": "A structured hiring and employee onboarding program designed to reduce time-to-hire by 35% and improve 90-day retention rates.",
+          "tech": [
+            "HRIS",
+            "ATS Optimization",
+            "Talent Sourcing",
+            "Labor Compliance"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "SHRM-CP / SHRM-SCP (Society for Human Resource Management)",
+          "level": "Senior",
+          "roi": "Maximum"
+        },
+        {
+          "name": "PHR / SPHR (Human Resource Certification Institute)",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Resolving complex employee relations and harassment investigations",
+        "Designing equity and compensation bands",
+        "Workforce planning during restructuring or hypergrowth"
+      ],
+      "high_value_skill_gaps": [
+        "Treating HR merely as administrative paperwork rather than strategic workforce data analytics."
+      ]
+    }
+  },
+  "CONSULTANT": {
+    "Management Consultant": {
+      "domain": "CONSULTANT",
+      "overview": "Solves complex business challenges, optimizes operational workflows, and advises corporate leadership on strategic transformations.",
+      "seniority_levels": {
+        "Junior": "Conducts quantitative market research, synthesizes benchmark data, and builds structured executive slide decks.",
+        "Mid-Level": "Leads workstreams, builds financial operating models, conducts stakeholder interviews, and identifies cost-saving efficiencies.",
+        "Senior": "Manages client engagements, presents recommendations to C-suite leadership, and oversees change management execution.",
+        "Partner/Director": "Generates consulting revenue, maintains client board relationships, and defines strategic practice offerings."
+      },
+      "foundational_skills": [
+        "Structured Problem Solving (MECE, Issue Trees)",
+        "Hypothesis-Driven Consulting",
+        "Financial & Operating Model Design",
+        "Change Management (Kotter/Prosci)",
+        "Executive Communication & Storytelling"
+      ],
+      "applied_tech_stack": [
+        "Excel (Advanced Financial Modeling)",
+        "PowerPoint / Think-Cell",
+        "Tableau",
+        "SQL",
+        "Minitab / Six Sigma Tools"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Enterprise Operational Transformation & Cost Optimization Case Study",
+          "description": "A comprehensive consulting engagement deliverable identifying $15M in supply chain efficiencies using Lean Six Sigma process mapping.",
+          "tech": [
+            "Consulting Frameworks",
+            "Financial Modeling",
+            "Executive Presentations",
+            "Process Mapping"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "Lean Six Sigma Black Belt",
+          "level": "Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "Project Management Professional (PMP)",
+          "level": "Senior",
+          "roi": "Very High"
+        },
+        {
+          "name": "Prosci Certified Change Management Practitioner",
+          "level": "Mid/Senior",
+          "roi": "High"
+        }
+      ],
+      "common_interview_topics": [
+        "Case interview market sizing and profitability analysis",
+        "Structuring ambiguous business problems using issue trees",
+        "Managing executive stakeholder resistance"
+      ],
+      "high_value_skill_gaps": [
+        "Presenting unstructured data without synthesis or actionable 'So What?' strategic implications."
+      ]
+    },
+    "Management Consultant & Strategy Advisor": {
+      "domain": "CONSULTANT",
+      "overview": "Expert career profile for Management Consultant & Strategy Advisor in the CONSULTANT industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Strategic Planning",
+        "Process Optimization",
+        "Financial Analysis",
+        "Stakeholder Management",
+        "Project Management"
+      ],
+      "applied_tech_stack": [
+        "Strategic Planning",
+        "Process Optimization",
+        "Financial Analysis",
+        "Stakeholder Management",
+        "Project Management",
+        "Business Case Development",
+        "Change Management"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Management Consultant & Strategy Advisor Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in CONSULTANT.",
+          "tech": [
+            "Strategic Planning",
+            "Process Optimization",
+            "Financial Analysis",
+            "Stakeholder Management"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "CONSULTANT Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced CONSULTANT tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Structured Problem Solving: MECE frameworks, hypothesis-driven issue trees, quantitative data synthesis, and executive PowerPoint storytelling.",
+        "phase_2": "Operational Transformation: Lean Six Sigma process mapping, organization redesign, financial valuation, and enterprise software benchmarking.",
+        "phase_3": "C-Suite Advisory: Digital transformation strategy, change management execution, board-level stakeholder alignment, and partner-track practice growth."
+      }
+    }
+  },
+  "ADVOCATE": {
+    "Corporate Legal Counsel & Advocate": {
+      "domain": "ADVOCATE",
+      "overview": "Expert career profile for Corporate Legal Counsel & Advocate in the ADVOCATE industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Legal Research",
+        "Contract Drafting",
+        "Litigation",
+        "Corporate Governance",
+        "Compliance"
+      ],
+      "applied_tech_stack": [
+        "Legal Research",
+        "Contract Drafting",
+        "Litigation",
+        "Corporate Governance",
+        "Compliance",
+        "Dispute Resolution",
+        "Intellectual Property",
+        "Negotiation"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Corporate Legal Counsel & Advocate Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in ADVOCATE.",
+          "tech": [
+            "Legal Research",
+            "Contract Drafting",
+            "Litigation",
+            "Corporate Governance"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "ADVOCATE Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced ADVOCATE tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Legal Foundations: Constitutional law, contract law, procedural litigation rules, and comprehensive legal research databases (LexisNexis/Westlaw).",
+        "phase_2": "Corporate & Contract Practice: Commercial contract drafting, compliance auditing, employment law, and alternative dispute resolution (ADR).",
+        "phase_3": "Senior Advisory: Cross-border M&A transactions, corporate governance frameworks, intellectual property strategy, and Bar leadership."
+      }
+    }
+  },
+  "AGRICULTURE": {
+    "Agronomist & Agricultural Specialist": {
+      "domain": "AGRICULTURE",
+      "overview": "Expert career profile for Agronomist & Agricultural Specialist in the AGRICULTURE industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Crop Management",
+        "Soil Science",
+        "Irrigation Systems",
+        "Agribusiness",
+        "Pest Management"
+      ],
+      "applied_tech_stack": [
+        "Crop Management",
+        "Soil Science",
+        "Irrigation Systems",
+        "Agribusiness",
+        "Pest Management",
+        "Sustainable Agriculture",
+        "Precision Farming",
+        "GIS"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Agronomist & Agricultural Specialist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in AGRICULTURE.",
+          "tech": [
+            "Crop Management",
+            "Soil Science",
+            "Irrigation Systems",
+            "Agribusiness"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "AGRICULTURE Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced AGRICULTURE tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Agricultural Science Basics: Soil mechanics, plant physiology, crop genetics, and meteorological data analysis.",
+        "phase_2": "Applied Agronomy & Irrigation: Drip irrigation systems, integrated pest management (IPM), soil nutrient balancing, and farm machinery.",
+        "phase_3": "Precision & AgTech: Drone imaging, GIS mapping, IoT soil sensors, agricultural supply chain economics, and organic certification."
+      }
+    }
+  },
+  "APPAREL": {
+    "Fashion & Apparel Designer": {
+      "domain": "APPAREL",
+      "overview": "Expert career profile for Fashion & Apparel Designer in the APPAREL industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Fashion Design",
+        "Pattern Making",
+        "Textile Technology",
+        "Garment Construction",
+        "Adobe Illustrator"
+      ],
+      "applied_tech_stack": [
+        "Fashion Design",
+        "Pattern Making",
+        "Textile Technology",
+        "Garment Construction",
+        "Adobe Illustrator",
+        "Tech Packs",
+        "Trend Forecasting",
+        "Quality Assurance"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Fashion & Apparel Designer Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in APPAREL.",
+          "tech": [
+            "Fashion Design",
+            "Pattern Making",
+            "Textile Technology",
+            "Garment Construction"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "APPAREL Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced APPAREL tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Design Foundations: Sketching, fabric anatomy, color theory, and digital CAD tools (Adobe Illustrator/Photoshop).",
+        "phase_2": "Garment Engineering: Technical pack development, manual & digital pattern grading, draping, and garment sampling.",
+        "phase_3": "Commercial Production: Supply chain sourcing, sustainable textile manufacturing, collection line planning, and fashion brand direction."
+      }
+    }
+  },
+  "ARTS": {
+    "Creative Director & Visual Artist": {
+      "domain": "ARTS",
+      "overview": "Expert career profile for Creative Director & Visual Artist in the ARTS industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Visual Arts",
+        "Creative Direction",
+        "Illustration",
+        "Digital Painting",
+        "Adobe Photoshop"
+      ],
+      "applied_tech_stack": [
+        "Visual Arts",
+        "Creative Direction",
+        "Illustration",
+        "Digital Painting",
+        "Adobe Photoshop",
+        "Concept Art",
+        "Typography",
+        "Art History"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Creative Director & Visual Artist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in ARTS.",
+          "tech": [
+            "Visual Arts",
+            "Creative Direction",
+            "Illustration",
+            "Digital Painting"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "ARTS Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced ARTS tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Artistic Fundamentals: Perspective drawing, anatomy, color theory, composition, and traditional media mastery.",
+        "phase_2": "Digital Media & Conceptualization: Digital illustration (Procreate/Photoshop), 3D asset integration (Blender), and narrative visual storytelling.",
+        "phase_3": "Creative Leadership: Brand visual direction, large-scale exhibition curation, IP development, and creative studio management."
+      }
+    }
+  },
+  "AUTOMOBILE": {
+    "Automotive Systems Engineer": {
+      "domain": "AUTOMOBILE",
+      "overview": "Expert career profile for Automotive Systems Engineer in the AUTOMOBILE industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Automotive Engineering",
+        "Vehicle Diagnostics",
+        "CAD/SolidWorks",
+        "Powertrain Systems",
+        "CAN Bus"
+      ],
+      "applied_tech_stack": [
+        "Automotive Engineering",
+        "Vehicle Diagnostics",
+        "CAD/SolidWorks",
+        "Powertrain Systems",
+        "CAN Bus",
+        "Electric Vehicles (EV)",
+        "Quality Control",
+        "MATLAB"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Automotive Systems Engineer Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in AUTOMOBILE.",
+          "tech": [
+            "Automotive Engineering",
+            "Vehicle Diagnostics",
+            "CAD/SolidWorks",
+            "Powertrain Systems"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "AUTOMOBILE Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced AUTOMOBILE tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Engineering Principles: Thermodynamics, fluid mechanics, CAD modeling (SolidWorks/CATIA), and automotive electrical circuits.",
+        "phase_2": "Vehicle Systems & Diagnostics: ECU programming, CAN bus communication, OBD-II diagnostics, and internal combustion/transmission systems.",
+        "phase_3": "EV & Autonomous Tech: Battery management systems (BMS), electric motor controls, ADAS sensors, and automotive safety standards (ISO 26262)."
+      }
+    }
+  },
+  "AVIATION": {
+    "Aviation Operations & Aerospace Specialist": {
+      "domain": "AVIATION",
+      "overview": "Expert career profile for Aviation Operations & Aerospace Specialist in the AVIATION industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Flight Operations",
+        "Aviation Safety (FAA/ICAO)",
+        "Aircraft Maintenance",
+        "Avionics",
+        "Air Traffic Management"
+      ],
+      "applied_tech_stack": [
+        "Flight Operations",
+        "Aviation Safety (FAA/ICAO)",
+        "Aircraft Maintenance",
+        "Avionics",
+        "Air Traffic Management",
+        "Aerodynamics",
+        "Logistics"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Aviation Operations & Aerospace Specialist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in AVIATION.",
+          "tech": [
+            "Flight Operations",
+            "Aviation Safety (FAA/ICAO)",
+            "Aircraft Maintenance",
+            "Avionics"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "AVIATION Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced AVIATION tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Aviation Basics: Aerodynamics, meteorology, air navigation, aircraft systems, and FAA/ICAO regulatory frameworks.",
+        "phase_2": "Operations & Avionics: Flight dispatch protocols, avionics diagnostics, aircraft weight and balance calculation, and SMS implementation.",
+        "phase_3": "Airline Leadership: Fleet reliability engineering, airport operations management, aerospace quality standards (AS9100), and IATA certifications."
+      }
+    }
+  },
+  "BANKING": {
+    "Commercial & Investment Banking Analyst": {
+      "domain": "BANKING",
+      "overview": "Expert career profile for Commercial & Investment Banking Analyst in the BANKING industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Commercial Banking",
+        "Credit Risk Analysis",
+        "Financial Modeling",
+        "Loan Underwriting",
+        "KYC/AML Compliance"
+      ],
+      "applied_tech_stack": [
+        "Commercial Banking",
+        "Credit Risk Analysis",
+        "Financial Modeling",
+        "Loan Underwriting",
+        "KYC/AML Compliance",
+        "Core Banking Systems",
+        "Wealth Management"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Commercial & Investment Banking Analyst Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in BANKING.",
+          "tech": [
+            "Commercial Banking",
+            "Credit Risk Analysis",
+            "Financial Modeling",
+            "Loan Underwriting"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "BANKING Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced BANKING tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Banking Operations: Retail & commercial banking instruments, double-entry financial analysis, credit scoring models, and AML/KYC regulations.",
+        "phase_2": "Underwriting & Credit Risk: Debt service coverage analysis (DSCR), corporate loan underwriting, collateral valuation, and financial modeling in Excel.",
+        "phase_3": "Capital Markets & Compliance: Basel III regulatory frameworks, syndicated loan facilities, treasury management, and CFA/FRM credentials."
+      }
+    }
+  },
+  "BPO": {
+    "BPO Operations & Customer Experience Lead": {
+      "domain": "BPO",
+      "overview": "Expert career profile for BPO Operations & Customer Experience Lead in the BPO industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "BPO Operations",
+        "Customer Support",
+        "Service Level Agreements (SLA)",
+        "CRM (Salesforce/Zendesk)",
+        "Quality Monitoring"
+      ],
+      "applied_tech_stack": [
+        "BPO Operations",
+        "Customer Support",
+        "Service Level Agreements (SLA)",
+        "CRM (Salesforce/Zendesk)",
+        "Quality Monitoring",
+        "Workforce Management (WFM)",
+        "Call Center Analytics"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade BPO Operations & Customer Experience Lead Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in BPO.",
+          "tech": [
+            "BPO Operations",
+            "Customer Support",
+            "Service Level Agreements (SLA)",
+            "CRM (Salesforce/Zendesk)"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "BPO Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced BPO tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Customer Service Excellence: Multi-channel support (voice, email, chat), CRM tools (Salesforce/Zendesk), active listening, and conflict de-escalation.",
+        "phase_2": "Operational Metrics & Quality: CSAT, NPS, FCR, and AHT monitoring, SLA adherence tracking, and quality assurance auditing.",
+        "phase_3": "Workforce & Process Optimization: Erlang-C staffing models, conversational AI/chatbot escalation workflows, and Six Sigma Green Belt process optimization."
+      }
+    }
+  },
+  "CHEF": {
+    "Executive Chef & Culinary Director": {
+      "domain": "CHEF",
+      "overview": "Expert career profile for Executive Chef & Culinary Director in the CHEF industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Culinary Arts",
+        "Menu Engineering",
+        "Food Safety (HACCP)",
+        "Kitchen Operations",
+        "Food Cost Control"
+      ],
+      "applied_tech_stack": [
+        "Culinary Arts",
+        "Menu Engineering",
+        "Food Safety (HACCP)",
+        "Kitchen Operations",
+        "Food Cost Control",
+        "Inventory Management",
+        "Recipe Standardization"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Executive Chef & Culinary Director Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in CHEF.",
+          "tech": [
+            "Culinary Arts",
+            "Menu Engineering",
+            "Food Safety (HACCP)",
+            "Kitchen Operations"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "CHEF Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced CHEF tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Culinary Fundamentals: Classical cooking techniques, knife skills, recipe execution, and ServSafe / HACCP hygiene protocols.",
+        "phase_2": "Kitchen Management & Plating: Menu development, food cost calculation (target < 30%), inventory FIFO systems, and station workflow coordination.",
+        "phase_3": "Culinary Innovation & Directorship: Fine dining menu curation, farm-to-table sourcing, restaurant P&L management, and culinary team mentorship."
+      }
+    }
+  },
+  "CONSTRUCTION": {
+    "Construction Project Manager & Civil Specialist": {
+      "domain": "CONSTRUCTION",
+      "overview": "Expert career profile for Construction Project Manager & Civil Specialist in the CONSTRUCTION industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Construction Management",
+        "AutoCAD",
+        "Site Safety (OSHA)",
+        "Project Scheduling (Primavera/MS Project)",
+        "Cost Estimation"
+      ],
+      "applied_tech_stack": [
+        "Construction Management",
+        "AutoCAD",
+        "Site Safety (OSHA)",
+        "Project Scheduling (Primavera/MS Project)",
+        "Cost Estimation",
+        "Structural Engineering",
+        "Quality Control"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Construction Project Manager & Civil Specialist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in CONSTRUCTION.",
+          "tech": [
+            "Construction Management",
+            "AutoCAD",
+            "Site Safety (OSHA)",
+            "Project Scheduling (Primavera/MS Project)"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "CONSTRUCTION Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced CONSTRUCTION tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Engineering Drawings & Safety: Blueprint reading, AutoCAD/Revit drafting, concrete & steel material properties, and OSHA site safety compliance.",
+        "phase_2": "Project Controls & Estimation: Bill of Quantities (BOQ), contractor bidding, Primavera P6 / MS Project critical path scheduling, and quality testing.",
+        "phase_3": "Megaproject Delivery: BIM (Building Information Modeling) 4D/5D management, LEED green building certifications, contract risk mitigation, and PMP credential."
+      }
+    }
+  },
+  "DIGITAL-MEDIA": {
+    "Digital Media & Content Marketing Specialist": {
+      "domain": "DIGITAL-MEDIA",
+      "overview": "Expert career profile for Digital Media & Content Marketing Specialist in the DIGITAL-MEDIA industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Digital Marketing",
+        "Content Creation",
+        "SEO",
+        "Social Media Marketing",
+        "Video Editing (Premiere/After Effects)"
+      ],
+      "applied_tech_stack": [
+        "Digital Marketing",
+        "Content Creation",
+        "SEO",
+        "Social Media Marketing",
+        "Video Editing (Premiere/After Effects)",
+        "Graphic Design",
+        "Google Analytics",
+        "Copywriting"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Digital Media & Content Marketing Specialist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in DIGITAL-MEDIA.",
+          "tech": [
+            "Digital Marketing",
+            "Content Creation",
+            "SEO",
+            "Social Media Marketing"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "DIGITAL-MEDIA Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced DIGITAL-MEDIA tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Content Production Foundations: Copywriting, Adobe Premiere/Canva asset creation, social channel algorithms, and basic on-page SEO.",
+        "phase_2": "Performance Marketing & Analytics: Meta & Google Ads campaign management, Google Analytics 4 (GA4) attribution, and email marketing funnels.",
+        "phase_3": "Omnichannel Media Strategy: High-production video storytelling, brand partnerships, viral growth loops, and brand reputation management."
+      }
+    }
+  },
+  "FITNESS": {
+    "Fitness & Wellness Coach": {
+      "domain": "FITNESS",
+      "overview": "Expert career profile for Fitness & Wellness Coach in the FITNESS industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Personal Training",
+        "Exercise Physiology",
+        "Sports Nutrition",
+        "Strength & Conditioning",
+        "Injury Prevention"
+      ],
+      "applied_tech_stack": [
+        "Personal Training",
+        "Exercise Physiology",
+        "Sports Nutrition",
+        "Strength & Conditioning",
+        "Injury Prevention",
+        "Kinesiology",
+        "Client Assessment"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Fitness & Wellness Coach Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in FITNESS.",
+          "tech": [
+            "Personal Training",
+            "Exercise Physiology",
+            "Sports Nutrition",
+            "Strength & Conditioning"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "FITNESS Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced FITNESS tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Anatomy & Biomechanics: Human anatomy, muscle mechanics, energy systems, and certified personal trainer credentials (NASM / ACE / ISSA).",
+        "phase_2": "Program Periodization & Nutrition: Progressive overload periodization, macronutrient calculation, functional movement screening, and injury rehabilitation.",
+        "phase_3": "High-Performance Coaching: Olympic lifting / sport-specific conditioning, wearable biometric tracking (HRV/VO2 Max), and elite athlete mentoring."
+      }
+    }
+  },
+  "PUBLIC-RELATIONS": {
+    "Public Relations & Media Communications Strategist": {
+      "domain": "PUBLIC-RELATIONS",
+      "overview": "Expert career profile for Public Relations & Media Communications Strategist in the PUBLIC-RELATIONS industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Public Relations",
+        "Press Releases",
+        "Crisis Communication",
+        "Media Relations",
+        "Corporate Communications"
+      ],
+      "applied_tech_stack": [
+        "Public Relations",
+        "Press Releases",
+        "Crisis Communication",
+        "Media Relations",
+        "Corporate Communications",
+        "Brand Reputation",
+        "Event Planning",
+        "Media Monitoring"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Public Relations & Media Communications Strategist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in PUBLIC-RELATIONS.",
+          "tech": [
+            "Public Relations",
+            "Press Releases",
+            "Crisis Communication",
+            "Media Relations"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "PUBLIC-RELATIONS Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced PUBLIC-RELATIONS tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Media Writing & Pitching: Press release drafting (AP Style), media list building (Muck Rack/Cision), and media contact outreach.",
+        "phase_2": "Campaigns & Reputation: Brand launch events, media interview prep for executives, influencer PR outreach, and sentiment tracking.",
+        "phase_3": "Crisis Management & Strategy: High-stakes crisis communications protocols, corporate stakeholder alignment, brand narrative sovereignty, and PR agency leadership."
+      }
+    }
+  },
+  "SALES": {
+    "Enterprise Sales & Account Specialist": {
+      "domain": "SALES",
+      "overview": "Expert career profile for Enterprise Sales & Account Specialist in the SALES industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "B2B Sales",
+        "Sales Pipeline Management",
+        "CRM (Salesforce/HubSpot)",
+        "Cold Outreach",
+        "Account Management"
+      ],
+      "applied_tech_stack": [
+        "B2B Sales",
+        "Sales Pipeline Management",
+        "CRM (Salesforce/HubSpot)",
+        "Cold Outreach",
+        "Account Management",
+        "Contract Closing",
+        "Negotiation",
+        "Customer Retention"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Enterprise Sales & Account Specialist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in SALES.",
+          "tech": [
+            "B2B Sales",
+            "Sales Pipeline Management",
+            "CRM (Salesforce/HubSpot)",
+            "Cold Outreach"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "SALES Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced SALES tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Outbound Prospecting: Cold calling, personalized cold email sequences, qualification frameworks (BANT/MEDDIC), and CRM logging.",
+        "phase_2": "Discovery & Closing: Value-based demo presentations, overcoming enterprise objections, contract negotiation, and quota achievement.",
+        "phase_3": "Key Account Management & Leadership: Large-scale enterprise renewals, cross-selling/upselling expansion, sales team coaching, and revenue leadership."
+      }
+    }
+  },
+  "TEACHER": {
+    "Academic Educator & Curriculum Specialist": {
+      "domain": "TEACHER",
+      "overview": "Expert career profile for Academic Educator & Curriculum Specialist in the TEACHER industry.",
+      "seniority_levels": {
+        "Junior": "Master core theoretical principles, tools, and entry-level workflows under supervision.",
+        "Mid-Level": "Independently execute complex technical deliverables and optimize operational workflows.",
+        "Senior": "Architect end-to-end systems, establish quality standards, and mentor junior team members.",
+        "Lead/Director": "Direct domain strategy, manage executive stakeholder alignment, and drive innovation."
+      },
+      "foundational_skills": [
+        "Curriculum Development",
+        "Classroom Management",
+        "Lesson Planning",
+        "Educational Technology (LMS)",
+        "Student Assessment"
+      ],
+      "applied_tech_stack": [
+        "Curriculum Development",
+        "Classroom Management",
+        "Lesson Planning",
+        "Educational Technology (LMS)",
+        "Student Assessment",
+        "Instructional Design",
+        "Differentiated Instruction"
+      ],
+      "must_build_projects": [
+        {
+          "title": "Production-Grade Academic Educator & Curriculum Specialist Deliverable Project",
+          "description": "A comprehensive real-world project demonstrating core competencies, quality compliance, and measurable impact in TEACHER.",
+          "tech": [
+            "Curriculum Development",
+            "Classroom Management",
+            "Lesson Planning",
+            "Educational Technology (LMS)"
+          ]
+        }
+      ],
+      "recommended_certifications": [
+        {
+          "name": "TEACHER Professional Certified Practitioner",
+          "level": "Senior",
+          "roi": "Very High"
+        }
+      ],
+      "common_interview_topics": [
+        "Core domain methodology and standards",
+        "Technical problem solving and trade-offs",
+        "Case study analysis and project lifecycle"
+      ],
+      "high_value_skill_gaps": [
+        "Lacking hands-on mastery of advanced TEACHER tools and industry compliance frameworks."
+      ],
+      "roadmap": {
+        "phase_1": "Pedagogy & Classroom Basics: Lesson planning (Bloom's Taxonomy), classroom management, formative/summative assessments, and teaching license credentials.",
+        "phase_2": "EdTech & Interactive Learning: Learning Management Systems (Canvas/Google Classroom), interactive STEM tools, and differentiated learning for diverse needs.",
+        "phase_3": "Curriculum Leadership: School curriculum standards alignment, teacher mentoring, instructional design evaluation, and academic department leadership."
+      }
+    }
+  }
+}
