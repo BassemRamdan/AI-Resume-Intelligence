@@ -1,28 +1,76 @@
 """
 AI Career Advisor Chatbot Service.
 Equipped with dense semantic RAG over the Career Roadmaps Knowledge Base.
-Integrates Groq API with deterministic English fallback.
+Integrates Groq API with dynamic conversational intelligence and fallback.
 """
 
 import os
+import re
 import json
 import requests
+from dotenv import load_dotenv
+
+# Ensure local environment variables are loaded
+load_dotenv(".env.local")
+load_dotenv(".env")
+
 from .prompts import get_prompt
 from ..career.taxonomy import CAREER_TAXONOMY, get_career_roadmap
 from ..career.rag import retrieve_roadmap_context
 
 GROQ_MODELS = [
     "allam-2-7b",
-    "qwen/qwen3.6-27b",
-    "llama-3.1-8b-instant"
+    "qwen/qwen3.6-27b"
 ]
 
 def generate_deterministic_advice(user_query: str, candidate_profile: dict, target_career: str = None) -> str:
-    """Generates a structured, evidence-backed English roadmap and advice when LLM is unreachable."""
+    """Generates an intelligent, evidence-backed English technical response when LLM API is unreachable."""
+    query_lower = user_query.lower()
     skills = [s.get("name", "") for s in candidate_profile.get("skills", [])]
     projects = [p.get("name", "") for p in candidate_profile.get("projects", [])]
     
-    # Determine target career
+    # Check if user is asking about a specific technical concept (e.g. "what is docker", "explain kubernetes", "what is CI/CD")
+    if "docker" in query_lower:
+        return """### 🐳 Understanding Docker in Modern Engineering
+
+**Docker** is an open-source containerization platform that packages applications and all their dependencies (code, runtime, system libraries, configuration) into lightweight, portable, self-contained units called **Containers**.
+
+---
+
+#### 🔑 Key Concepts:
+- **Dockerfile:** A text blueprint containing sequential instructions to assemble a Docker image.
+- **Docker Image:** An immutable, read-only template used to instantiate runtime containers.
+- **Docker Container:** A running, isolated instance of an image executing in user-space.
+- **Docker Compose:** A tool for defining and running multi-container applications with shared networking and volumes.
+
+---
+
+#### 💡 Why It Matters for Your Career:
+- **Environment Consistency:** Eliminates the classic *"it works on my machine"* deployment bug.
+- **Microservices & Cloud Portability:** Essential prerequisite for deploying to AWS ECS, Azure Container Apps, and Kubernetes.
+- **Portfolio Recommendation:** Containerize your existing projects (`ChatApp`, `Ecom-App`, or backend APIs) using a `Dockerfile` and `docker-compose.yml` to showcase production readiness to recruiters.
+"""
+
+    if "kubernetes" in query_lower or "k8s" in query_lower:
+        return """### ☸️ Understanding Kubernetes (K8s)
+
+**Kubernetes** is an enterprise container orchestration system designed to automate the deployment, scaling, load balancing, and management of containerized applications across clusters of host machines.
+
+---
+
+#### 🔑 Core Architecture:
+- **Pods:** The smallest deployable computing units running one or more co-located containers.
+- **Deployments & ReplicaSets:** Manages declarative rolling updates and self-healing replicas.
+- **Services & Ingress:** Exposes Pods to internal cluster traffic or external internet routing with load balancing.
+- **ConfigMaps & Secrets:** Decouples configuration and credentials from container images.
+
+---
+
+#### 🎯 Career Roadmap Recommendation:
+Start by mastering Docker, then install **Minikube** or **k3s** locally, write YAML deployment manifests, and consider studying for the **Certified Kubernetes Administrator (CKA)** certification.
+"""
+
+    # If general roadmap / skill gap request:
     if not target_career:
         target_career = "Software Engineer"
         for c_name in CAREER_TAXONOMY.keys():
@@ -48,7 +96,7 @@ def generate_deterministic_advice(user_query: str, candidate_profile: dict, targ
 
 #### 🔍 2. High-Priority Skill Gap Analysis
 The following critical competencies are required to reach full competitiveness in the **{target_career}** track:
-{chr(10).join([f"- **{s}**: High-demand standard requirement." for s in missing[:5]])}
+{chr(10).join([f"- **{s}**: High-demand industry standard requirement." for s in missing[:5]])}
 
 ---
 
@@ -112,7 +160,7 @@ CANDIDATE EVIDENCE PROFILE:
 - Target Career Track: {target_career or 'Software Engineer'}
 - Target Baseline Skills: {req_skills}
 
-RETRIEVED EXPERT RAG KNOWLEDGE BASE CHUNKS (Reference Roadmap, Project Blueprints & Senior Milestones):
+RETRIEVED EXPERT RAG KNOWLEDGE BASE CHUNKS:
 {rag_context}
 """
     
@@ -120,7 +168,7 @@ RETRIEVED EXPERT RAG KNOWLEDGE BASE CHUNKS (Reference Roadmap, Project Blueprint
         {"role": "system", "content": f"{sys_prompt}\n\n{context_str}"}
     ]
     
-    for m in messages[-6:]:
+    for m in messages[-8:]:
         full_messages.append({"role": m.get("role", "user"), "content": m.get("content", "")})
         
     for model_name in GROQ_MODELS:
@@ -143,7 +191,8 @@ RETRIEVED EXPERT RAG KNOWLEDGE BASE CHUNKS (Reference Roadmap, Project Blueprint
                 data = res.json()
                 content = data["choices"][0]["message"]["content"]
                 if content and len(content.strip()) > 10:
-                    return content
+                    clean_content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+                    return clean_content if clean_content else content.strip()
         except Exception as e:
             print(f"Chatbot model {model_name} error: {e}")
             continue
