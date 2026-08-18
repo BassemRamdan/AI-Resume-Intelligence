@@ -165,10 +165,12 @@ Ask me anything about your technical growth:
 
       const data = await response.json();
       
+      const replyContent = data.response || data.reply || data.content || data.message;
+      
       const botMsg: ChatMessage = {
         id: `bot-${Date.now()}`,
         role: "assistant",
-        content: data.reply || "I apologize, but I could not synthesize a roadmap at this moment.",
+        content: replyContent || "I apologize, but I could not synthesize a roadmap at this moment.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
