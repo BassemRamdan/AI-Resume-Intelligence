@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareerLens AI — Complete Architecture & Multi-Model AI Ecosystem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #060913;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --bg-code: #0b1120;
+      --border-subtle: rgba(148, 163, 184, 0.12);
+      --border-focus: rgba(99, 102, 241, 0.5);
+      
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --secondary: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.65;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 65%, rgba(139, 92, 246, 0.10) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-main);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* Hero Header */
+    header.hero {
+      padding: 80px 0 50px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .badge-pill span.dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    h1.title {
+      font-size: 3.4rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 70%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 860px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+
+    /* Key Metrics Bar */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+    }
+
+    .stat-val {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #ffffff;
+      font-feature-settings: "tnum";
+    }
+    .stat-val.c-indigo { color: #818cf8; }
+    .stat-val.c-emerald { color: #34d399; }
+    .stat-val.c-cyan { color: #22d3ee; }
+    .stat-val.c-amber { color: #fbbf24; }
+    .stat-lbl {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs-wrapper {
+      position: sticky;
+      top: 20px;
+      z-index: 100;
+      margin-bottom: 48px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 6px;
+      overflow-x: auto;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    /* Section Styling */
+    section.tab-pane {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    section.tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      margin-bottom: 36px;
+    }
+
+    .section-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    h2.section-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    p.section-desc {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 850px;
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      h1.title { font-size: 2.4rem; }
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-focus);
+      box-shadow: 0 15px 35px -10px rgba(0,0,0,0.6);
+      background: var(--bg-card-hover);
+    }
+
+    .card-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    .badge-indigo { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-cyan { background: rgba(6, 182, 212, 0.15); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-rose { background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    .card h3 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .card ul li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 10px;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .card ul li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    /* Architecture Visual Diagrams */
+    .diagram-container {
+      background: #090e1a;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      margin-bottom: 36px;
+      position: relative;
+    }
+
+    .pipeline-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: relative;
+    }
+
+    .pipeline-stage {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      position: relative;
+    }
+
+    .stage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      padding-bottom: 12px;
+    }
+
+    .stage-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stage-models {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stage-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .flow-card {
+      background: rgba(11, 17, 32, 0.8);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+
+    .flow-card-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .flow-card-desc {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Flow Arrow */
+    .flow-connector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+      margin: -10px 0;
+      text-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* Code Blocks */
+    .code-box {
+      background: var(--bg-code);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin: 18px 0;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.88rem;
+    }
+
+    .code-header {
+      background: #0f172a;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .code-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .code-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #334155;
+    }
+    .code-dots span:nth-child(1) { background: #ef4444; }
+    .code-dots span:nth-child(2) { background: #f59e0b; }
+    .code-dots span:nth-child(3) { background: #10b981; }
+
+    pre.code-content {
+      padding: 18px;
+      overflow-x: auto;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    .kw { color: #f43f5e; font-weight: 600; }
+    .fn { color: #38bdf8; }
+    .str { color: #a7f3d0; }
+    .num { color: #fbbf24; }
+    .comment { color: #64748b; font-style: italic; }
+    .var { color: #c084fc; }
+
+    /* Formula Banner */
+    .formula-banner {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      text-align: center;
+      margin: 24px 0 36px;
+    }
+
+    .formula-text {
+      font-family: 'Fira Code', monospace;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 16px;
+      text-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+
+    .weights-breakdown {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .weight-chip {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .weight-chip strong {
+      color: #ffffff;
+    }
+
+    /* Comparison Table */
+    .table-container {
+      overflow-x: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin: 24px 0;
+    }
+
+    table.custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    table.custom-table th {
+      background: #0f172a;
+      padding: 14px 18px;
+      color: #cbd5e1;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-subtle);
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.8px;
+    }
+
+    table.custom-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+      color: var(--text-muted);
+    }
+
+    table.custom-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-left: 4px solid var(--primary);
+      background: rgba(99, 102, 241, 0.08);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 18px 24px;
+      margin: 20px 0;
+    }
+
+    .callout.callout-success {
+      border-left-color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .callout.callout-amber {
+      border-left-color: var(--accent-amber);
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .callout h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .callout p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* Footer */
+    footer {
+      padding: 60px 0 40px;
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      margin-top: 80px;
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Hero Header -->
+    <header class="hero">
+      <div class="badge-pill">
+        <span class="dot"></span> Production Architecture & Multi-Model Engine Map
+      </div>
+      <h1 class="title">CareerLens AI</h1>
+      <p class="subtitle">
+        A deep-dive technical architectural blueprint: How 6 specialized ML models, deterministic mathematical scoring, dense semantic RAG, and Groq LLMs work in synergy to eliminate hallucinations and transform raw resumes into verifiable career intelligence.
+      </p>
+
+      <div class="hero-stats">
+        <div class="stat-card">
+          <div class="stat-val c-indigo">6 AI Models</div>
+          <div class="stat-lbl">Coordinated in Pipeline</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val c-emerald">83.83%</div>
+          <div class="stat-lbl">Transformer Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val c-cyan">6-Signal</div>
+          <div class="stat-lbl">Deterministic Fit Formula</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val c-amber">0% Hallucination</div>
+          <div class="stat-lbl">On Scoring & Evidence</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sticky Navigation Tabs -->
+    <div class="nav-tabs-wrapper">
+      <nav class="nav-tabs" id="mainTabs">
+        <button class="tab-btn active" onclick="switchTab('tab-problems')">🎯 Problems Solved</button>
+        <button class="tab-btn" onclick="switchTab('tab-models')">🧠 Multi-AI Ecosystem</button>
+        <button class="tab-btn" onclick="switchTab('tab-pipeline')">⚡ Codebase & Flow</button>
+        <button class="tab-btn" onclick="switchTab('tab-engine')">📐 Deterministic Fit Math</button>
+        <button class="tab-btn" onclick="switchTab('tab-llm')">💬 LLMs, RAG & Prompts</button>
+        <button class="tab-btn" onclick="switchTab('tab-matrix')">📊 Verified Metrics</button>
+      </nav>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 1: PROBLEMS SOLVED -->
+    <!-- ========================================================================= -->
+    <section id="tab-problems" class="tab-pane active">
+      <div class="section-header">
+        <span class="section-tag">Core Value Proposition</span>
+        <h2 class="section-title">What Critical Industry Problems Did We Solve?</h2>
+        <p class="section-desc">
+          CareerLens AI replaces fragile keyword matching and untrustworthy black-box LLMs with a mathematically grounded, verifiable intelligence pipeline.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Problem 1 -->
+        <div class="card">
+          <span class="card-badge badge-rose">Problem 1: ATS Keyword Stuffing</span>
+          <h3>Traditional ATS Parsers</h3>
+          <p>
+            Standard Applicant Tracking Systems rely on literal regex matching. A candidate writing "Flask & FastAPI microservices" receives 0 points if the recruiter searched for "Python Web Frameworks".
+          </p>
+          <ul>
+            <li>Trivially defeated by white-text keyword stuffing</li>
+            <li>Zero understanding of semantic synonymy or hierarchy</li>
+            <li>Treats unrelated words in random sections as valid skills</li>
+          </ul>
+          <div class="callout callout-success" style="margin-top: 18px;">
+            <h4>✨ Our Solution</h4>
+            <p><strong>GLiNER zero-shot NER + 117-Entity Canonical Ontology</strong> extracts verified context and normalizes tech stacks without regex fragility.</p>
+          </div>
+        </div>
+
+        <!-- Problem 2 -->
+        <div class="card">
+          <span class="card-badge badge-amber">Problem 2: LLM Hallucinations</span>
+          <h3>Pure LLM Evaluators</h3>
+          <p>
+            Feeding raw resumes directly to commercial LLMs (like GPT-4) causes stochastic, non-reproducible scoring, phantom skill fabrication, and high API latency.
+          </p>
+          <ul>
+            <li>Scores fluctuate wildly between identical prompts</li>
+            <li>No verifiable mathematical audit trail for hiring decisions</li>
+            <li>High API cost and token truncation on long resumes</li>
+          </ul>
+          <div class="callout callout-success" style="margin-top: 18px;">
+            <h4>✨ Our Solution</h4>
+            <p><strong>Strict Separation of Concerns:</strong> Deterministic models compute exact 6-signal math; LLMs <em>only narrate</em> verified JSON evidence.</p>
+          </div>
+        </div>
+
+        <!-- Problem 3 -->
+        <div class="card">
+          <span class="card-badge badge-indigo">Problem 3: The Career Direction Void</span>
+          <h3>No Actionable Roadmaps</h3>
+          <p>
+            Existing tools only classify a candidate or search jobs. They never diagnose <em>why</em> a candidate fell short or how to systematically transition to their target role.
+          </p>
+          <ul>
+            <li>Rejections provide zero feedback on missing competencies</li>
+            <li>Candidates don't know which projects to build for high ROI</li>
+            <li>Generic advice is not tailored to the candidate's actual resume</li>
+          </ul>
+          <div class="callout callout-success" style="margin-top: 18px;">
+            <h4>✨ Our Solution</h4>
+            <p><strong>Dense Semantic RAG + 28 Career Taxonomy Tracks:</strong> Diagnoses exact skill gaps and provides 3-phase milestone roadmaps with portfolio project blueprints.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDF Extraction Bug Fix Highlight -->
+      <div class="card" style="margin-top: 30px; border-color: rgba(16, 185, 129, 0.4);">
+        <span class="card-badge badge-emerald">Engineering Triumph: Multi-Column PDF Noise Bleed</span>
+        <h3>Resolving Multi-Column Layout Artifacts in Resume Parsing</h3>
+        <p>
+          In modern resumes with dual-column layouts (e.g., DEPI .NET resumes), text extraction libraries often interleave left-column metadata (such as provider names, locations, and applicant names) into the right-column certification titles.
+        </p>
+        <div class="grid-2" style="margin-top: 16px;">
+          <div>
+            <h4 style="color: #f87171; font-size: 0.95rem; margin-bottom: 8px;">❌ Before (Raw Bleed Noise):</h4>
+            <div class="code-box" style="margin: 0;">
+              <pre class="code-content"><span class="comment">// Fragmented, corrupted extractions:</span>
+- "Accredited Provider"
+- "YOUSSEF MOHAMED"
+- "Alexandria, Egypt"
+- "Full Stack .NET Web Developer"</pre>
+            </div>
+          </div>
+          <div>
+            <h4 style="color: #34d399; font-size: 0.95rem; margin-bottom: 8px;">✅ After (High-Precision Reconstructor in <code>extractor.py</code>):</h4>
+            <div class="code-box" style="margin: 0;">
+              <pre class="code-content"><span class="comment">// Clean, verified entity synthesis:</span>
+- "Full Stack .NET Web Developer - Digital Egypt Pioneers Program (DEPI)"
+- "QCourse110: Introduction to Quantum Computing - QWorld"</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: MULTI-AI ECOSYSTEM -->
+    <!-- ========================================================================= -->
+    <section id="tab-models" class="tab-pane">
+      <div class="section-header">
+        <span class="section-tag">AI Collaboration Engine</span>
+        <h2 class="section-title">How Multiple AI Models Work Together</h2>
+        <p class="section-desc">
+          CareerLens AI is not a single model wrapper. It is a harmonious symphony of 6 distinct AI engines, each assigned to the specific task it performs with highest accuracy and lowest latency.
+        </p>
+      </div>
+
+      <!-- Models Table -->
+      <div class="table-container">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Model Name</th>
+              <th>Type / Architecture</th>
+              <th>Exact Role in System</th>
+              <th>Execution Environment</th>
+              <th>Key Advantage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color: #818cf8;">PyMuPDF Layout Parser</strong></td>
+              <td>C++ Text & Layout Engine</td>
+              <td>Extracts physical text blocks, hierarchy, column count</td>
+              <td>CPU (Native bindings)</td>
+              <td>10x faster than PDFPlumber; preserves layout metadata</td>
+            </tr>
+            <tr>
+              <td><strong style="color: #c084fc;">urchade/gliner_multi-v2.1</strong></td>
+              <td>Bidirectional Zero-Shot NER</td>
+              <td>Extracts skills, degrees, universities, jobs, projects</td>
+              <td>PyTorch / CPU (Singleton)</td>
+              <td>Zero-shot capability on arbitrary custom label schemas</td>
+            </tr>
+            <tr>
+              <td><strong style="color: #38bdf8;">Resume DeBERTa Classifier</strong></td>
+              <td>Fine-Tuned Sequence Classifier</td>
+              <td>Predicts primary career domain among 24 categories</td>
+              <td>PyTorch / CPU (Singleton)</td>
+              <td><strong>83.83% Test Accuracy</strong> (18% above Linear SVM)</td>
+            </tr>
+            <tr>
+              <td><strong style="color: #34d399;">all-MiniLM-L6-v2</strong></td>
+              <td>SentenceTransformer Embedder</td>
+              <td>Generates 384-dim dense vectors for candidate & prototypes</td>
+              <td>PyTorch / CPU (Singleton)</td>
+              <td>Dense semantic cosine similarity; sub-50ms vectorization</td>
+            </tr>
+            <tr>
+              <td><strong style="color: #fbbf24;">Dense RAG Retriever</strong></td>
+              <td>Semantic Cosine KB Search</td>
+              <td>Pulls top-3 relevant roadmap chunks from expert KB</td>
+              <td>NumPy / CPU Vector Search</td>
+              <td>Injects verified domain roadmaps into LLM context</td>
+            </tr>
+            <tr>
+              <td><strong style="color: #f43f5e;">Groq Flagship LLMs (120B)</strong></td>
+              <td><code>openai/gpt-oss-120b</code> + Fallbacks</td>
+              <td>Narrates fit evidence & conversational career advisory</td>
+              <td>Groq LPU Cloud (Ultra-Fast)</td>
+              <td>120B parameter reasoning with 0% scoring hallucination</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Model Collaboration Diagram -->
+      <div class="diagram-container" style="margin-top: 36px;">
+        <h3 style="color: #ffffff; margin-bottom: 20px; font-size: 1.3rem;">🔄 Model Orchestration & Data Handshake</h3>
+        
+        <div class="pipeline-flow">
+          
+          <!-- Stage 1 -->
+          <div class="pipeline-stage" style="border-color: rgba(99, 102, 241, 0.4);">
+            <div class="stage-header">
+              <div class="stage-title">
+                <span class="badge-pill" style="margin: 0; padding: 3px 10px;">Stage 1</span>
+                Physical Layout & Named Entity Extraction
+              </div>
+              <div class="stage-models">
+                <span class="card-badge badge-indigo">PyMuPDF</span>
+                <span class="card-badge badge-cyan">GLiNER v2.1</span>
+                <span class="card-badge badge-emerald">Skill Ontology</span>
+              </div>
+            </div>
+            <div class="stage-content">
+              <div class="flow-card">
+                <div class="flow-card-title">📄 PyMuPDF Parser</div>
+                <div class="flow-card-desc">PDF → Raw Text + Layout Hierarchy + Column Detection</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">🧩 Regex Section Segmenter</div>
+                <div class="flow-card-desc">Segments into: Skills, Experience, Education, Projects, Certs</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">🧠 GLiNER Zero-Shot Extraction</div>
+                <div class="flow-card-desc">Chunks text in 1,500-char blocks; threshold = 0.35</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">📚 Canonical Skill Normalizer</div>
+                <div class="flow-card-desc">117+ Ontology mappings: "py" → "Python", "k8s" → "Kubernetes"</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-connector">▼ Outputs: Structured Profile JSON</div>
+
+          <!-- Stage 2 -->
+          <div class="pipeline-stage" style="border-color: rgba(139, 92, 246, 0.4);">
+            <div class="stage-header">
+              <div class="stage-title">
+                <span class="badge-pill" style="margin: 0; padding: 3px 10px;">Stage 2</span>
+                Dual-Track Intelligence & Vector Space Mapping
+              </div>
+              <div class="stage-models">
+                <span class="card-badge badge-cyan">DeBERTa Classifier</span>
+                <span class="card-badge badge-indigo">all-MiniLM-L6-v2</span>
+                <span class="card-badge badge-amber">24 Prototype Centroids</span>
+              </div>
+            </div>
+            <div class="stage-content">
+              <div class="flow-card">
+                <div class="flow-card-title">🎯 24-Class DeBERTa Model</div>
+                <div class="flow-card-desc">Predicts primary category (e.g., "INFORMATION-TECHNOLOGY", 94.2%)</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">📐 384-Dim Vector Embedder</div>
+                <div class="flow-card-desc">Generates dense candidate vector: candidate_emb = encode(raw_text)</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">👥 KNN Peer Search</div>
+                <div class="flow-card-desc">Compares with 2,466 pre-computed embeddings → Top-3 similar resumes</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">🌐 Prototype Centroid Cosine</div>
+                <div class="flow-card-desc">Computes cosine distance with 24 L2-normalized domain centroids</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-connector">▼ Feeds Into: 6-Signal Deterministic Engine</div>
+
+          <!-- Stage 3 -->
+          <div class="pipeline-stage" style="border-color: rgba(16, 185, 129, 0.4);">
+            <div class="stage-header">
+              <div class="stage-title">
+                <span class="badge-pill" style="margin: 0; padding: 3px 10px;">Stage 3</span>
+                Deterministic Scoring & Anti-Hallucination Gate
+              </div>
+              <div class="stage-models">
+                <span class="card-badge badge-emerald">lib/career/engine.py</span>
+                <span class="card-badge badge-rose">Relevance Gate</span>
+              </div>
+            </div>
+            <div class="stage-content">
+              <div class="flow-card">
+                <div class="flow-card-title">⚖️ Mathematical Weights</div>
+                <div class="flow-card-desc">0.35*Skills + 0.20*Projects + 0.20*Semantic + 0.10*Edu + 0.10*Exp + 0.05*Class</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">🛡️ Anti-Hallucination Gate</div>
+                <div class="flow-card-desc">If skills==0 and projects==0: effective_semantic = semantic * 0.20</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">🏆 Top-5 Career Ranking</div>
+                <div class="flow-card-desc">Ranks 28 career tracks with exact matched & missing evidence arrays</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-connector">▼ Passes Grounded JSON to: Generative Advisory Layer</div>
+
+          <!-- Stage 4 -->
+          <div class="pipeline-stage" style="border-color: rgba(244, 63, 94, 0.4);">
+            <div class="stage-header">
+              <div class="stage-title">
+                <span class="badge-pill" style="margin: 0; padding: 3px 10px;">Stage 4</span>
+                Generative Explanation & Interactive RAG Chatbot
+              </div>
+              <div class="stage-models">
+                <span class="card-badge badge-rose">Groq 120B LLM</span>
+                <span class="card-badge badge-amber">Dense RAG Engine</span>
+                <span class="card-badge badge-indigo">Allam / Qwen Fallback</span>
+              </div>
+            </div>
+            <div class="stage-content">
+              <div class="flow-card">
+                <div class="flow-card-title">📖 Evidence-Based Explanation</div>
+                <div class="flow-card-desc">Groq takes engine JSON → Writes human-readable justification</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">🔎 RAG Roadmap Retriever</div>
+                <div class="flow-card-desc">Embeds user question → Retrieves top-3 milestones from 24-domain KB</div>
+              </div>
+              <div class="flow-card">
+                <div class="flow-card-title">💬 AI Career Advisor</div>
+                <div class="flow-card-desc">Interactive multi-turn conversation with structured milestones & pro-tips</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: CODEBASE & EXECUTION FLOW -->
+    <!-- ========================================================================= -->
+    <section id="tab-pipeline" class="tab-pane">
+      <div class="section-header">
+        <span class="section-tag">Codebase Topology</span>
+        <h2 class="section-title">End-to-End Code Orchestration & Data Flow</h2>
+        <p class="section-desc">
+          How every directory, file, and function interacts across the FastAPI backend and Next.js frontend.
+        </p>
+      </div>
+
+      <!-- File Map Grid -->
+      <div class="grid-2">
+        <div class="card">
+          <span class="card-badge badge-indigo">FastAPI Backend (`main.py`)</span>
+          <h3>Server Lifecycle & Model Warmup</h3>
+          <p>
+            To prevent cold-start inference lag, all ML models are loaded into RAM during FastAPI startup via the <code>@asynccontextmanager</code> lifespan hook:
+          </p>
+          <div class="code-box">
+            <div class="code-header">
+              <span>main.py : lines 28-40</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre class="code-content"><span class="kw">@asynccontextmanager</span>
+<span class="kw">async def</span> <span class="fn">lifespan</span>(app: FastAPI):
+    <span class="comment"># Preload and cache all singletons in RAM</span>
+    <span class="fn">get_gliner_model</span>(<span class="str">"cpu"</span>)
+    <span class="fn">get_classifier_model</span>(<span class="str">"cpu"</span>)
+    <span class="fn">get_embedder_model</span>(<span class="str">"cpu"</span>)
+    <span class="fn">get_embedding_resources</span>()
+    <span class="kw">yield</span></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="card-badge badge-cyan">Extraction Pipeline (`lib/resume/extractor.py`)</span>
+          <h3>Section Parsing & Entity Assembly</h3>
+          <p>
+            Coordinates the transformation of binary PDF bytes into a clean, normalized JSON schema:
+          </p>
+          <div class="code-box">
+            <div class="code-header">
+              <span>lib/resume/extractor.py</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre class="code-content"><span class="kw">def</span> <span class="fn">extract_resume</span>(pdf_path, classifier_fn=<span class="kw">None</span>):
+    raw_text = <span class="fn">extract_pdf_layout</span>(pdf_path)
+    sections = <span class="fn">split_into_sections</span>(raw_text)
+    entities = <span class="fn">extract_gliner_entities</span>(sections)
+    skills = <span class="fn">normalize_skills</span>(entities[<span class="str">'skills'</span>])
+    certs = <span class="fn">reconstruct_certifications</span>(sections[<span class="str">'certs'</span>])
+    <span class="kw">return</span> candidate_profile</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step-by-Step Execution Walkthrough -->
+      <div class="card" style="margin-top: 24px;">
+        <span class="card-badge badge-emerald">Runtime Trace</span>
+        <h3>Trace of a Single Request: From Drag & Drop to Results Render</h3>
+        
+        <div style="margin-top: 20px;">
+          <div class="callout">
+            <h4>1. User Uploads Resume (`app/upload/page.tsx`)</h4>
+            <p>User drops a PDF (e.g., <code>Bassem_Ramadan_Resume.pdf</code>). Frontend validates file extension and size (&lt;5MB), then dispatches a multipart POST to <code>POST /api/upload</code>.</p>
+          </div>
+
+          <div class="callout">
+            <h4>2. Next.js API Routes to FastAPI (`app/api/upload/route.ts`)</h4>
+            <p>Calls <code>RemoteResumeProvider.extractProfile()</code> which forwards the file buffer to FastAPI <code>POST /api/extract</code> on port 8000.</p>
+          </div>
+
+          <div class="callout">
+            <h4>3. Entity Extraction & Normalization</h4>
+            <p>FastAPI runs PyMuPDF layout analysis → splits into regex sections → feeds text blocks into GLiNER v2.1 NER → normalizes detected skills against <code>lib/resume/ontology.py</code> → classifies domain with DeBERTa sequence classifier.</p>
+          </div>
+
+          <div class="callout">
+            <h4>4. Deterministic Career Fit Engine (`POST /api/career-map`)</h4>
+            <p>Candidate profile is evaluated across all 28 career tracks. Calculates exact skill ratios, project keyword overlaps, prototype centroid cosines, and applies the Anti-Hallucination Gate.</p>
+          </div>
+
+          <div class="callout">
+            <h4>5. Groq Evidence Explanation (`POST /api/careers`)</h4>
+            <p>The resulting similarity data is sent to Groq's 120B model to generate conversational justifications and highlight missing competencies.</p>
+          </div>
+
+          <div class="callout callout-success">
+            <h4>6. Interactive UI Render (`app/profile/page.tsx` & `app/careers/page.tsx`)</h4>
+            <p>Renders the Candidate Profile Card, Verified Skills chips, Top-5 Career Recommendation meters, KNN peer benchmarks, and opens the floating AI Career Advisor chatbot.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: DETERMINISTIC FIT MATH -->
+    <!-- ========================================================================= -->
+    <section id="tab-engine" class="tab-pane">
+      <div class="section-header">
+        <span class="section-tag">The Mathematical Core</span>
+        <h2 class="section-title">The 6-Signal Deterministic Career Fit Engine</h2>
+        <p class="section-desc">
+          Why did we build a mathematical formula instead of letting an LLM guess? Because mathematics cannot hallucinate, provides 100% reproducible results, and guarantees full legal transparency.
+        </p>
+      </div>
+
+      <!-- Formula Banner -->
+      <div class="formula-banner">
+        <div class="formula-text">
+          Fit Score = 0.35·S + 0.20·P + 0.20·M̃ + 0.10·Edu + 0.10·Exp + 0.05·C
+        </div>
+        <div class="weights-breakdown">
+          <div class="weight-chip"><strong style="color: #818cf8;">35%</strong> Skill Match (S)</div>
+          <div class="weight-chip"><strong style="color: #34d399;">20%</strong> Project Relevance (P)</div>
+          <div class="weight-chip"><strong style="color: #c084fc;">20%</strong> Semantic Prototype (M̃)</div>
+          <div class="weight-chip"><strong style="color: #fbbf24;">10%</strong> Education Match (Edu)</div>
+          <div class="weight-chip"><strong style="color: #22d3ee;">10%</strong> Experience Match (Exp)</div>
+          <div class="weight-chip"><strong style="color: #f43f5e;">5%</strong> Domain Classifier (C)</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Signal Breakdown -->
+        <div class="card">
+          <span class="card-badge badge-indigo">Detailed Signal Definitions</span>
+          <h3>How Each Signal is Computed</h3>
+          <ul>
+            <li><strong>Skill Match (35%):</strong> Ratio of verified extracted candidate skills that match the taxonomy's required skills: <code>|matched_skills| / |required_skills|</code></li>
+            <li><strong>Project Relevance (20%):</strong> Overlap between candidate project descriptions and domain project keywords: <code>|matched_keywords| / |required_keywords|</code></li>
+            <li><strong>Semantic Similarity (20%):</strong> Cosine similarity between candidate dense embedding and the target domain's L2-normalized centroid: <code>cos_sim(cand_vec, proto_vec)</code></li>
+            <li><strong>Education Match (10%):</strong> Binary check (1.0 or 0.0) verifying if candidate degree matches field keywords (e.g., "Computer Science").</li>
+            <li><strong>Experience Match (10%):</strong> Binary check verifying if historical job titles match domain roles (e.g., "Developer", "Software Engineer").</li>
+            <li><strong>Classification Signal (5%):</strong> DeBERTa model confidence if the primary predicted category matches the domain.</li>
+          </ul>
+        </div>
+
+        <!-- Anti-Hallucination Gate -->
+        <div class="card">
+          <span class="card-badge badge-rose">Anti-Hallucination Gate</span>
+          <h3>Preventing Semantic Vocabulary Drift</h3>
+          <p>
+            A common failure of pure vector embeddings is that generic corporate words ("management", "systems", "analysis") can cause an Accountant's resume to have moderate cosine similarity to IT prototypes.
+          </p>
+          <div class="callout callout-amber" style="margin-top: 14px;">
+            <h4>🛡️ The Relevance Gate Formula:</h4>
+            <p>If a candidate has <strong>0 matched skills</strong> AND <strong>0 matched projects</strong> for a target career track, the semantic component is penalized by 80%:</p>
+          </div>
+          <div class="code-box">
+            <div class="code-header">
+              <span>lib/career/engine.py : lines 116-120</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <pre class="code-content"><span class="comment"># Anti-Hallucination Relevance Gate</span>
+effective_semantic = semantic_score
+<span class="kw">if</span> skill_score == <span class="num">0</span> <span class="kw">and</span> project_score == <span class="num">0</span>:
+    effective_semantic = semantic_score * <span class="num">0.20</span></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 5: LLMS, RAG & PROMPTS -->
+    <!-- ========================================================================= -->
+    <section id="tab-llm" class="tab-pane">
+      <div class="section-header">
+        <span class="section-tag">Generative Intelligence</span>
+        <h2 class="section-title">LLM Orchestration, Prompt Engineering & Dense RAG</h2>
+        <p class="section-desc">
+          How we engineered prompts and retrieval pipelines to ensure the Groq 120B model provides grounded career advisory without ever fabricating credentials.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Model Fallback Strategy -->
+        <div class="card">
+          <span class="card-badge badge-rose">Multi-LLM Fallback Strategy</span>
+          <h3>Zero-Downtime Resilience</h3>
+          <p>
+            The system executes a sequential fallback across top-tier open-source LLMs hosted on Groq's high-speed LPU infrastructure:
+          </p>
+          <ol style="padding-left: 20px; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+            <li style="margin-bottom: 8px;"><strong style="color: #ffffff;">Primary:</strong> <code>openai/gpt-oss-120b</code> (Flagship reasoning & roadmap synthesis)</li>
+            <li style="margin-bottom: 8px;"><strong style="color: #ffffff;">Secondary:</strong> <code>allam-2-7b</code> (Fast sovereign model fallback)</li>
+            <li style="margin-bottom: 8px;"><strong style="color: #ffffff;">Tertiary:</strong> <code>qwen/qwen3.6-27b</code> (Multilingual & technical backup)</li>
+            <li><strong style="color: #ffffff;">Offline Fallback:</strong> Deterministic rule-based template engine in <code>chatbot.py</code></li>
+          </ol>
+        </div>
+
+        <!-- RAG Architecture -->
+        <div class="card">
+          <span class="card-badge badge-cyan">Dense Semantic RAG</span>
+          <h3>Domain Roadmap Retrieval</h3>
+          <p>
+            <code>lib/career/rag.py</code> indexes expert career milestones, high-ROI certifications, and portfolio project blueprints from <code>data/career_roadmaps_kb.json</code>.
+          </p>
+          <ul>
+            <li>Chunks indexed into 5 categories per role (Overview, Tech Stack, Projects, Certs, 3-Phase Roadmap)</li>
+            <li>Encoded via <code>SentenceTransformer</code> into normalized dense vectors</li>
+            <li>Retrieves top-3 relevant chunks using dot product cosine similarity + 0.35 target career boost</li>
+          </ul>
+        </div>
+
+        <!-- Prompt Engineering -->
+        <div class="card">
+          <span class="card-badge badge-emerald">Prompt Engineering Rules</span>
+          <h3>5 Strict Guardrails</h3>
+          <p>
+            Our system prompt (<code>prompts/chatbot.txt</code>) enforces 5 critical boundaries on the LLM:
+          </p>
+          <ul>
+            <li><strong>English Only:</strong> Guarantees technical term consistency</li>
+            <li><strong>Grounding Constraint:</strong> Never claim a skill that is not present in <code>Extracted Skills</code></li>
+            <li><strong>Structured Markdown:</strong> Responses must include checklists, roadmap phases, and portfolio blueprints</li>
+            <li><strong>Think-Tag Sanitization:</strong> Regex filters strip internal reasoning tags (<code>&lt;think&gt;</code>) before UI render</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Prompt Code Box -->
+      <div class="card" style="margin-top: 28px;">
+        <span class="card-badge badge-indigo">System Prompt Architecture (`lib/llm/chatbot.py`)</span>
+        <h3>Context Injection Schema</h3>
+        <div class="code-box">
+          <div class="code-header">
+            <span>Augmented Context Payload sent to Groq 120B</span>
+            <div class="code-dots"><span></span><span></span><span></span></div>
+          </div>
+          <pre class="code-content">CANDIDATE EVIDENCE PROFILE:
+- Extracted Skills: Python, Docker, SQL, FastAPI, Git, React
+- Extracted Projects: E-Commerce Microservices, Portfolio Website
+- Target Career Track: Machine Learning Engineer
+- Target Baseline Skills: Python, PyTorch, Scikit-Learn, MLOps, Docker, Pandas
+
+RETRIEVED EXPERT RAG KNOWLEDGE BASE CHUNKS:
+Career Role: Machine Learning Engineer (INFORMATION-TECHNOLOGY)
+Recommended Portfolio Project Blueprints:
+- Project Title: End-to-End Model Deployment Pipeline with ONNX & FastAPI
+- High-ROI Certifications: AWS Certified Machine Learning Specialty
+- Step-by-Step Learning Roadmap:
+  Phase 1: Math & Baseline Scikit-Learn Modeling
+  Phase 2: Deep Learning (PyTorch) & Transformer Fine-Tuning
+  Phase 3: Production MLOps (MLflow, Docker, Kubernetes)</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 6: VERIFIED METRICS -->
+    <!-- ========================================================================= -->
+    <section id="tab-matrix" class="tab-pane">
+      <div class="section-header">
+        <span class="section-tag">Scientific Validation</span>
+        <h2 class="section-title">Verified Empirical Benchmarks & Dataset Facts</h2>
+        <p class="section-desc">
+          Every number below has been verified directly from the dataset files and Jupyter notebook execution outputs.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Classification Benchmarks -->
+        <div class="card">
+          <span class="card-badge badge-emerald">Model Classification Benchmarks (Test Set: 371 Resumes)</span>
+          <h3>Sequence Classification Performance</h3>
+          <div class="table-container" style="margin-top: 14px;">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Model / Algorithm</th>
+                  <th>Test Accuracy</th>
+                  <th>Macro Precision</th>
+                  <th>Macro Recall</th>
+                  <th>Macro F1</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Logistic Regression (TF-IDF)</td>
+                  <td>65.77%</td>
+                  <td>62.10%</td>
+                  <td>58.40%</td>
+                  <td>59.91%</td>
+                </tr>
+                <tr>
+                  <td>Linear SVM (TF-IDF)</td>
+                  <td>66.85%</td>
+                  <td>63.50%</td>
+                  <td>60.80%</td>
+                  <td>61.93%</td>
+                </tr>
+                <tr style="background: rgba(99, 102, 241, 0.12); font-weight: 700;">
+                  <td style="color: #ffffff;">Fine-Tuned DeBERTa Transformer</td>
+                  <td style="color: #34d399;">83.83%</td>
+                  <td style="color: #818cf8;">76.43%</td>
+                  <td style="color: #818cf8;">77.64%</td>
+                  <td style="color: #34d399;">76.41%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 10px;">
+            * Improvement: <strong>+18.06%</strong> accuracy over baseline. Tested on 24 balanced & unbalanced professional domains.
+          </p>
+        </div>
+
+        <!-- Dataset Facts -->
+        <div class="card">
+          <span class="card-badge badge-cyan">Dataset & Corpus Facts</span>
+          <h3>Verified Corpus Statistics</h3>
+          <div class="table-container" style="margin-top: 14px;">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Metric Name</th>
+                  <th>Verified Value</th>
+                  <th>Source File</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Total Clean Resumes</td>
+                  <td><strong style="color: #ffffff;">2,466</strong></td>
+                  <td><code>data/processed_resumes.csv</code></td>
+                </tr>
+                <tr>
+                  <td>Stratified Train / Val / Test</td>
+                  <td><strong style="color: #ffffff;">1,726 / 369 / 371</strong></td>
+                  <td><code>03_Classification.ipynb</code></td>
+                </tr>
+                <tr>
+                  <td>Professional Categories</td>
+                  <td><strong style="color: #ffffff;">24 Domains</strong></td>
+                  <td><code>data/processed_resumes.csv</code></td>
+                </tr>
+                <tr>
+                  <td>Specialized Career Tracks</td>
+                  <td><strong style="color: #ffffff;">28 Tracks</strong></td>
+                  <td><code>lib/career/taxonomy.py</code></td>
+                </tr>
+                <tr>
+                  <td>Canonical Technical Skills</td>
+                  <td><strong style="color: #ffffff;">117 Skills</strong></td>
+                  <td><code>lib/resume/ontology.py</code></td>
+                </tr>
+                <tr>
+                  <td>Dense Embedding Dimensions</td>
+                  <td><strong style="color: #ffffff;">384 Float32</strong></td>
+                  <td><code>data/embeddings.npy</code></td>
+                </tr>
+                <tr>
+                  <td>Mean Word Count per Resume</td>
+                  <td><strong style="color: #ffffff;">809.1 Words</strong></td>
+                  <td><code>01_EDA.ipynb</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        <strong>CareerLens AI</strong> — AI-Driven Resume Intelligence & Career Recommendation System<br>
+        Graduation Project & Technical Architecture Document &bull; Verified from Repository Codebase
+      </p>
+    </footer>
+
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      // Deactivate all tab panes
+      document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('active');
+      });
+      // Deactivate all tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      // Activate target tab pane
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) {
+        targetPane.classList.add('active');
+      }
+      // Activate clicked tab button
+      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
+      // Scroll smoothly to top of content
+      window.scrollTo({
+        top: 280,
+        behavior: 'smooth'
+      });
+    }
+  </script>
+</body>
+</html>

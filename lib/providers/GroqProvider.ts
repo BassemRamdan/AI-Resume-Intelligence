@@ -3,12 +3,9 @@ import { GenerativeAIProvider } from "./GenerativeAIProvider";
 
 export class GroqProvider implements GenerativeAIProvider {
   private client: Groq;
-  private model: string;
 
   constructor() {
-    // Requires GROQ_API_KEY to be set in environment
     this.client = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
-    this.model = 'allam-2-7b';
   }
 
   async cleanProfile(rawProfile: any): Promise<any> {
@@ -51,15 +48,15 @@ STRICT RULES:
 1. DO NOT invent skills, projects, or experience. Use ONLY what is provided in the JSON.
 2. The score is deterministic. Explain the score using the evidence (Skill Match, Project Match, etc.).
 
-Return a strict JSON object with this schema:
+Return a strict, valid JSON object with this exact schema:
 {
   "classification_analysis": "1 sentence explaining the primary classification.",
   "top_careers": [
     {
       "career": "The exact career name (e.g. Machine Learning Engineer)",
-      "total_fit": "The total_fit percentage",
+      "total_fit": 0.0,
       "why": "A 2-3 sentence explanation connecting their matched skills and projects to this career.",
-      "missing_evidence": "A 1 sentence explanation of what they are missing (e.g. Docker, MLOps) based on the missing_skills array."
+      "missing_evidence": "A 1 sentence explanation of what they are missing based on the missing_skills array."
     }
   ],
   "similar_profiles_analysis": "A 1-2 sentence summary explaining the KNN semantic similarity peer group."
@@ -69,7 +66,6 @@ Return a strict JSON object with this schema:
       return await this.callGroq(prompt);
     } catch (e) {
       console.warn("Groq failed, falling back to deterministic explanation generation:", e);
-      // Fallback deterministic response so the UI NEVER breaks
       const primaryCat = similarityData?.classification?.category || "General";
       const fitList = similarityData?.career_fit || [];
       return {
@@ -92,7 +88,8 @@ Return a strict JSON object with this schema:
       throw new Error("GROQ_API_KEY is not configured.");
     }
     
-    const candidateModels = ['allam-2-7b', 'qwen/qwen3.6-27b'];
+    // Primary flagship 120B model followed by fallback models
+    const candidateModels = ['openai/gpt-oss-120b', 'allam-2-7b', 'qwen/qwen3.6-27b'];
     
     for (const model of candidateModels) {
       try {
@@ -103,8 +100,14 @@ Return a strict JSON object with this schema:
           temperature: 0.2,
         });
 
-        const content = chatCompletion.choices[0]?.message?.content;
+        let content = chatCompletion.choices[0]?.message?.content;
         if (content) {
+          // Clean potential reasoning tags or trailing text
+          content = content.trim();
+          const match = content.match(/\{[\s\S]*\}/);
+          if (match) {
+            return JSON.parse(match[0]);
+          }
           return JSON.parse(content);
         }
       } catch (error: any) {

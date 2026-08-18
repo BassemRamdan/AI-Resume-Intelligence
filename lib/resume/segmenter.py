@@ -1,7 +1,7 @@
 """
 Heuristic Section Segmentation Module.
 Segments cleaned resume text into functional blocks:
-SKILLS, EXPERIENCE, EDUCATION, PROJECTS, CERTIFICATIONS, LANGUAGES, ACTIVITIES, SUMMARY.
+SKILLS, SOFT_SKILLS, EXPERIENCE, EDUCATION, PROJECTS, CERTIFICATIONS, LANGUAGES, ACTIVITIES, SUMMARY.
 """
 
 import re
@@ -9,10 +9,12 @@ import re
 SECTION_PATTERNS = {
     "SUMMARY": r'(?:^|\n)(?:\d+\.\s*)?(?:professional\s+summary|summary|profile|about\s+me|career\s+objective|objective)\b[:\s]*',
     "SKILLS": r'(?:^|\n)(?:\d+\.\s*)?(?:technical\s+|core\s+)?(?:skills|technologies|proficiencies|tech\s+stack|competencies|expertise|tools\s+&\s+technologies)\b[:\s]*',
+    "SOFT_SKILLS": r'(?:^|\n)(?:\d+\.\s*)?(?:soft\s+|interpersonal\s+|personal\s+)?(?:skills|competencies|qualities|attributes|personal\s+traits)\b[:\s]*',
     "EXPERIENCE": r'(?:^|\n)(?:\d+\.\s*)?(?:work\s+|professional\s+|employment\s+)?(?:experience|history|employment|work\s+history|career\s+history)\b[:\s]*',
     "EDUCATION": r'(?:^|\n)(?:\d+\.\s*)?(?:education|academic\s+background|qualifications|academic\s+history)\b[:\s]*',
     "PROJECTS": r'(?:^|\n)(?:\d+\.\s*)?(?:key\s+|technical\s+|academic\s+|personal\s+)?(?:projects|portfolio|open\s+source|work\s+samples)\b[:\s]*',
-    "CERTIFICATIONS": r'(?:^|\n)(?:\d+\.\s*)?(?:certifications|certificates|licenses|courses|accreditations|training|certificates\s*&\s*courses)(?:\s*&\s*activities)?\b[:\s]*',
+    "CERTIFICATIONS": r'(?:^|\n)(?:\d+\.\s*)?(?:certifications|certificates|licenses|accreditations|certificates\s*&\s*courses)\b[:\s]*',
+    "COURSES": r'(?:^|\n)(?:\d+\.\s*)?(?:courses|training|workshops|bootcamps)\b[:\s]*',
     "LANGUAGES": r'(?:^|\n)(?:\d+\.\s*)?(?:languages|language\s+proficiency|language\s+skills)\b[:\s]*',
     "ACTIVITIES": r'(?:^|\n)(?:\d+\.\s*)?(?:activities|extracurricular|volunteering|community|honors|awards|achievements)\b[:\s]*',
     "CONTACT": r'(?:^|\n)(?:\d+\.\s*)?(?:contact\s+info|contact\s+information|contact|personal\s+details|personal\s+info|location)\b[:\s]*'
@@ -69,5 +71,12 @@ def split_into_sections(text: str) -> dict:
             sections[sec_name] += "\n\n" + content
         else:
             sections[sec_name] = content
+            
+    # Merge COURSES into CERTIFICATIONS if found
+    if sections.get("COURSES"):
+        if sections.get("CERTIFICATIONS"):
+            sections["CERTIFICATIONS"] += "\n\n" + sections["COURSES"]
+        else:
+            sections["CERTIFICATIONS"] = sections["COURSES"]
             
     return sections
