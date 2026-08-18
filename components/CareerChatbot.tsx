@@ -8,20 +8,16 @@ import {
   X, 
   Compass, 
   Send, 
-  RefreshCw, 
   RotateCcw, 
   Maximize2,
   Minimize2,
   ChevronDown,
-  Layers,
-  CheckCheck,
   Copy,
-  Lightbulb,
-  Cpu,
   BrainCircuit,
-  Terminal,
   Zap,
-  Check
+  Check,
+  Flame,
+  ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MarkdownMessage from "./MarkdownMessage";
@@ -46,7 +42,7 @@ const QUICK_PROMPTS = [
     query: "Generate a comprehensive, step-by-step milestone learning roadmap for my target career track based on my verified skills and missing competencies." 
   },
   { 
-    icon: "🔍",
+    icon: "🎯",
     label: "Seniority Diagnostics", 
     query: "Based on my extracted skills, projects, and work history, what is my current seniority level (Junior / Mid / Senior), and what exact architectural milestones do I need to reach the next level?" 
   },
@@ -82,7 +78,7 @@ export default function CareerChatbot({ candidateProfile, topCareers = [], defau
 
 I am your **AI Technical Career Architect & Senior Advisor**, powered by **Groq 120B Generative AI & Dense Semantic RAG Intelligence**.
 
-I have direct access to your verified candidate profile (skills, projects, and work history) and our **24-domain expert knowledge base**.
+I have direct access to your verified candidate profile (skills, projects, and credentials) and our **24-domain expert knowledge base**.
 
 Ask me anything about your technical growth:
 - 🗺️ **Personalized Roadmaps:** Concrete 3-phase progression paths based on your actual skills.
@@ -101,23 +97,17 @@ Ask me anything about your technical growth:
   useEffect(() => {
     if (defaultCareer) {
       setSelectedCareer(defaultCareer);
-    } else if (topCareers.length > 0) {
-      setSelectedCareer(topCareers[0].career);
     }
-  }, [defaultCareer, topCareers]);
+  }, [defaultCareer]);
 
   useEffect(() => {
     if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      scrollToBottom();
     }
-  }, [messages, isOpen, loading]);
+  }, [messages, isOpen]);
 
-  const handleResetChat = () => {
-    setMessages([{ 
-      ...initialGreeting, 
-      id: `init-${Date.now()}`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-    }]);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleCopyMessage = (id: string, text: string) => {
@@ -126,77 +116,86 @@ Ask me anything about your technical growth:
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleResetChat = () => {
+    setMessages([initialGreeting]);
+  };
+
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputMessage).trim();
     if (!query || loading) return;
 
-    const userMsg: ChatMessage = { 
-      id: `user-${Date.now()}`,
-      role: "user", 
+    const userMessageId = `user-${Date.now()}`;
+    const userMsg: ChatMessage = {
+      id: userMessageId,
+      role: "user",
       content: query,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
-    setInputMessage("");
+
+    setMessages((prev) => [...prev, userMsg]);
+    if (!textToSend) setInputMessage("");
     setLoading(true);
 
     try {
+      const historyPayload = messages
+        .filter((m) => m.id !== "init-0")
+        .map((m) => ({
+          role: m.role,
+          content: m.content
+        }));
+
+      historyPayload.push({
+        role: "user",
+        content: query
+      });
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+          messages: historyPayload,
           candidateProfile,
           targetCareer: selectedCareer
-        }),
+        })
       });
 
       if (!response.ok) {
-        throw new Error("Failed to contact advisor service");
+        throw new Error(`Chat API error (${response.status})`);
       }
 
       const data = await response.json();
-      setMessages((prev) => [
-        ...prev,
-        { 
-          id: `asst-${Date.now()}`,
-          role: "assistant", 
-          content: data.response || "No response received.",
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]);
+      
+      const botMsg: ChatMessage = {
+        id: `bot-${Date.now()}`,
+        role: "assistant",
+        content: data.reply || "I apologize, but I could not synthesize a roadmap at this moment.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      setMessages((prev) => [...prev, botMsg]);
     } catch (err: any) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `err-${Date.now()}`,
-          role: "assistant",
-          content: "⚠️ An error occurred while communicating with the AI Advisor. Please verify that the FastAPI backend is running on port 8000.",
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]);
+      console.error("Chatbot error:", err);
+      const errorMsg: ChatMessage = {
+        id: `bot-err-${Date.now()}`,
+        role: "assistant",
+        content: `⚠️ **Advisory Engine Notice:**\nUnable to reach generative AI service. Please ensure that the FastAPI backend or Groq API connection is active.\n*Details: ${err.message || 'Network Timeout'}*`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages((prev) => [...prev, errorMsg]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
   return (
     <>
-      {/* Ultra-Modern Floating Launcher with Multi-Color Conic Glow Ring */}
-      <div className="fixed bottom-6 right-6 z-50">
+      {/* Floating Modern AI Copilot Launcher */}
+      <div className="fixed bottom-6 right-6 z-40">
         <motion.button
-          onClick={() => setIsOpen(true)}
-          className="relative group flex items-center gap-3 p-[2px] rounded-full shadow-2xl shadow-indigo-500/35 hover:shadow-indigo-500/60 hover:scale-105 active:scale-95 transition-all"
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => setIsOpen(true)}
+          className="relative group p-1 rounded-full shadow-2xl focus:outline-none"
         >
           {/* Animated 3-Color Gradient Border */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400 animate-spin opacity-80 blur-xs group-hover:opacity-100" style={{ animationDuration: '8s' }} />
@@ -218,16 +217,16 @@ Ask me anything about your technical growth:
         </motion.button>
       </div>
 
-      {/* Advanced Slide-Over AI Copilot Drawer */}
+      {/* Advanced Midnight Obsidian Copilot Drawer */}
       <AnimatePresence>
         {isOpen && (
-          <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/75 backdrop-blur-md transition-all">
+          <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/80 backdrop-blur-lg transition-all">
             <motion.div
               initial={{ x: "100%", opacity: 0.8 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0.8 }}
               transition={{ type: "spring", damping: 26, stiffness: 220 }}
-              className={`h-full bg-slate-50/95 shadow-2xl flex flex-col border-l border-slate-200/90 transition-all duration-300 ${
+              className={`h-full bg-slate-950 shadow-2xl flex flex-col border-l border-slate-800 transition-all duration-300 ${
                 isMaximized ? "w-full max-w-none" : "w-full md:w-[85vw] lg:w-[75vw] xl:max-w-5xl"
               }`}
             >
@@ -235,7 +234,7 @@ Ask me anything about your technical growth:
               <div className="h-[3px] w-full bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400" />
 
               {/* Header Bar */}
-              <div className="px-6 py-4 bg-slate-950 text-white flex items-center justify-between shadow-xl">
+              <div className="px-6 py-4 bg-slate-950 border-b border-slate-800/90 text-white flex items-center justify-between shadow-lg">
                 <div className="flex items-center gap-3.5">
                   <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-cyan-500 p-0.5 shadow-md shadow-indigo-500/25">
                     <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-cyan-300">
@@ -247,7 +246,7 @@ Ask me anything about your technical growth:
                       <h3 className="font-black text-base md:text-lg tracking-tight text-white flex items-center gap-2">
                         CareerLens AI Copilot
                       </h3>
-                      <span className="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1.5">
+                      <span className="text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         Groq 120B LPU Active
                       </span>
@@ -263,21 +262,21 @@ Ask me anything about your technical growth:
                   <button
                     onClick={() => setIsMaximized(!isMaximized)}
                     title={isMaximized ? "Restore Size" : "Maximize Window"}
-                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/80 transition-colors"
                   >
                     {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                   </button>
                   <button
                     onClick={handleResetChat}
                     title="Reset Conversation"
-                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/80 transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
                     title="Close Window"
-                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
+                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/80 transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -285,9 +284,9 @@ Ask me anything about your technical growth:
               </div>
 
               {/* Target Career Filter Bar */}
-              <div className="px-6 py-2.5 bg-white border-b border-slate-200/80 flex items-center justify-between gap-3 text-xs shadow-2xs">
-                <div className="flex items-center gap-2.5 text-slate-700 font-medium w-full">
-                  <div className="flex items-center gap-1.5 text-indigo-600 font-bold">
+              <div className="px-6 py-3 bg-slate-900/90 border-b border-slate-800/80 flex items-center justify-between gap-3 text-xs shadow-xs">
+                <div className="flex items-center gap-2.5 text-slate-300 font-medium w-full">
+                  <div className="flex items-center gap-1.5 text-cyan-400 font-bold shrink-0">
                     <Compass className="w-4 h-4" />
                     <span>Target Track:</span>
                   </div>
@@ -295,7 +294,7 @@ Ask me anything about your technical growth:
                     <select
                       value={selectedCareer}
                       onChange={(e) => setSelectedCareer(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs appearance-none pr-8 cursor-pointer text-xs"
+                      className="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-1.5 text-white font-bold focus:outline-none focus:ring-2 focus:ring-cyan-500 shadow-inner appearance-none pr-8 cursor-pointer text-xs"
                     >
                       {topCareers.map((c: any, i: number) => (
                         <option key={i} value={c.career}>
@@ -313,18 +312,18 @@ Ask me anything about your technical growth:
                       <option value="Mechanical & Systems Engineer">Mechanical Engineer (ENGINEERING)</option>
                       <option value="Business Development Manager">Business Development (BUSINESS)</option>
                     </select>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2 pointer-events-none" />
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5 pointer-events-none" />
                   </div>
                 </div>
               </div>
 
-              {/* Quick Action Prompt Chips with 3-Color Borders */}
-              <div className="px-6 py-2.5 bg-gradient-to-r from-indigo-50/70 via-purple-50/50 to-cyan-50/70 border-b border-slate-200/80 overflow-x-auto flex gap-2 no-scrollbar">
+              {/* Quick Action Prompt Chips */}
+              <div className="px-6 py-2.5 bg-slate-950/90 border-b border-slate-800/80 overflow-x-auto flex gap-2 no-scrollbar">
                 {QUICK_PROMPTS.map((p, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSendMessage(p.query)}
-                    className="text-xs px-3 py-1.5 rounded-xl bg-white/90 border border-slate-200 hover:border-indigo-400 text-slate-800 hover:text-indigo-600 hover:bg-white transition-all whitespace-nowrap shadow-xs font-bold flex items-center gap-1.5 active:scale-95 flex-shrink-0"
+                    className="text-xs px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-cyan-400/80 text-slate-300 hover:text-cyan-300 hover:bg-slate-800/90 transition-all whitespace-nowrap shadow-xs font-semibold flex items-center gap-1.5 active:scale-95 flex-shrink-0"
                   >
                     <span>{p.icon}</span>
                     <span>{p.label}</span>
@@ -333,7 +332,7 @@ Ask me anything about your technical growth:
               </div>
 
               {/* Chat Message Stream */}
-              <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-950 bg-grid-cyber">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
@@ -348,31 +347,31 @@ Ask me anything about your technical growth:
                       </div>
                     )}
                     
-                    <div className="flex flex-col gap-1.5 max-w-[92%] md:max-w-[85%]">
+                    <div className="flex flex-col gap-1.5 max-w-[94%] md:max-w-[85%]">
                       {/* Message Bubble Card */}
                       <div
-                        className={`rounded-3xl p-6 text-sm leading-relaxed shadow-sm transition-all ${
+                        className={`rounded-3xl p-6 text-sm leading-relaxed shadow-xl transition-all ${
                           msg.role === "user"
-                            ? "bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 text-white font-medium shadow-indigo-500/20 rounded-tr-none"
-                            : "glass-card-3d text-slate-800 border border-slate-200/90 rounded-tl-none prose-chat relative group"
+                            ? "bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 text-white font-medium shadow-indigo-500/25 border border-indigo-400/30 rounded-tr-none"
+                            : "glass-cyber-card text-slate-200 border border-slate-800/90 rounded-tl-none relative group"
                         }`}
                       >
                         {/* Copy Full Response Action in Assistant Bubble */}
                         {msg.role === "assistant" && (
-                          <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 text-[11px] text-slate-400">
-                            <span className="font-mono flex items-center gap-1 text-indigo-600 font-bold">
-                              <Sparkles className="w-3 h-3 text-cyan-500" />
-                              Career Advisor Output
+                          <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-slate-800 text-[11px] text-slate-400">
+                            <span className="font-mono flex items-center gap-1.5 text-cyan-400 font-bold">
+                              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                              Career Advisor Blueprint
                             </span>
                             <button
                               onClick={() => handleCopyMessage(msg.id, msg.content)}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700"
                               title="Copy response markdown"
                             >
                               {copiedId === msg.id ? (
                                 <>
-                                  <Check className="w-3 h-3 text-emerald-500" />
-                                  <span className="text-emerald-600 font-bold">Copied!</span>
+                                  <Check className="w-3 h-3 text-emerald-400" />
+                                  <span className="text-emerald-400 font-bold">Copied!</span>
                                 </>
                               ) : (
                                 <>
@@ -392,7 +391,7 @@ Ask me anything about your technical growth:
                       </div>
                       
                       {/* Timestamp */}
-                      <span className={`text-[10px] text-slate-400 px-2 font-mono ${msg.role === "user" ? "text-right" : "text-left"}`}>
+                      <span className={`text-[10px] text-slate-500 px-2 font-mono ${msg.role === "user" ? "text-right" : "text-left"}`}>
                         {msg.timestamp}
                       </span>
                     </div>
@@ -414,19 +413,19 @@ Ask me anything about your technical growth:
                         <Bot className="w-5 h-5" />
                       </div>
                     </div>
-                    <div className="glass-card-3d p-4 rounded-3xl rounded-tl-none border border-indigo-100 flex items-center gap-4">
+                    <div className="glass-cyber-card p-4 rounded-3xl rounded-tl-none border border-indigo-500/30 flex items-center gap-4">
                       {/* 3 Neon Bouncing Dots */}
                       <div className="flex items-center gap-1.5 px-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 typing-dot-1" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-violet-600 typing-dot-2" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 typing-dot-3" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 typing-dot-1" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-violet-500 typing-dot-2" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 typing-dot-3" />
                       </div>
                       <div className="space-y-0.5">
-                        <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                          <Zap className="w-3 h-3 text-amber-500 animate-pulse" />
+                        <p className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <Zap className="w-3 h-3 text-amber-400 animate-pulse" />
                           <span>Groq 120B Synthesizing Roadmap & Evidence...</span>
                         </p>
-                        <p className="text-[11px] text-slate-500 font-mono">Querying Dense Semantic RAG & verifying candidate profile</p>
+                        <p className="text-[11px] text-slate-400 font-mono">Querying Dense Semantic RAG & verifying candidate profile</p>
                       </div>
                     </div>
                   </div>
@@ -436,7 +435,7 @@ Ask me anything about your technical growth:
               </div>
 
               {/* Message Input Box with Modern Glassmorphism */}
-              <div className="p-4 md:p-5 bg-white/95 border-t border-slate-200/90 shadow-2xl backdrop-blur-xl">
+              <div className="p-4 md:p-5 bg-slate-950 border-t border-slate-800 shadow-2xl">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -449,26 +448,33 @@ Ask me anything about your technical growth:
                       rows={2}
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder="Ask any technical or career question (e.g. 'Assess my seniority', 'Mastering Python/C#', 'Suggest high-ROI projects')... (Press Enter to Send)"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      placeholder={`Ask any technical or career question (e.g. "Assess my seniority", "Explain clean architecture", "Suggest high-ROI projects")... (Press Enter to Send)`}
+                      className="flex-1 bg-slate-900 border border-slate-700/90 rounded-2xl p-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none shadow-inner"
                       disabled={loading}
-                      className="flex-1 bg-slate-50 border border-slate-300/80 rounded-2xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all placeholder:text-slate-400 font-medium resize-none leading-relaxed shadow-inner"
                     />
+
                     <button
                       type="submit"
-                      disabled={!inputMessage.trim() || loading}
-                      className="p-3.5 bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-600 text-white rounded-2xl hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/25 active:scale-95 flex items-center justify-center flex-shrink-0"
+                      disabled={loading || !inputMessage.trim()}
+                      className="p-3.5 bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 text-white rounded-2xl hover:shadow-lg hover:shadow-indigo-500/40 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 transition-all font-bold shrink-0 flex items-center justify-center"
                     >
                       <Send className="w-5 h-5" />
                     </button>
                   </div>
-                  
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
-                    <span>💡 Press <strong className="text-slate-600">Enter</strong> to send, <strong className="text-slate-600">Shift + Enter</strong> for a new line</span>
-                    <span className="font-mono text-[10px]">Model: gpt-oss-120b &bull; 0% Hallucination</span>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 px-1 font-mono">
+                    <span>⚡ Enter: Send &bull; Shift + Enter: Newline</span>
+                    <span>120B Generative RAG &bull; 0% Hallucination Guard</span>
                   </div>
                 </form>
               </div>
+
             </motion.div>
           </div>
         )}
