@@ -2,7 +2,7 @@
 Resume Extractor Pipeline.
 Combines PyMuPDF Computer Vision layout parsing, section segmentation,
 GLiNER NER entity extraction, and Skill Ontology normalization.
-Features universal multi-strategy block parsing for Projects, Certifications, Education, and Experience.
+Features universal multi-strategy fail-safe block parsing for Projects, Certifications, Education, and Experience.
 """
 
 import os
@@ -30,8 +30,14 @@ KNOWN_TECH_KEYWORDS = [
     "OpenCV", "XGBoost", "Streamlit", "MediaPipe", "Experta", "Pygame", "Surprise", 
     "Matplotlib", "Seaborn", "NLP", "FastAPI", "Docker", "Flask", "Django", "JavaScript", 
     "TypeScript", "C#", "C++", "Java", "AWS", "Git", "Database Design", "RESTful APIs",
-    "EDA", "PCA", "SVD", "K-Medoids", "Minimax", "CNN", "FFNN", "MLP"
+    "EDA", "PCA", "SVD", "K-Medoids", "Minimax", "CNN", "FFNN", "MLP", "HTML", "CSS",
+    "Angular", "Vue", "Next.js", "Kubernetes", "Linux", "Azure", "GCP", "PostgreSQL", "MongoDB"
 ]
+
+NON_PROJECT_KEYWORDS = re.compile(
+    r'^(?:bachelor|master|b\.sc|m\.sc|ph\.d|degree|faculty|university|institute|college|school|academic|education|experience|summary|profile|competencies|skills|certifications|languages|contact|email|phone)\b',
+    re.IGNORECASE
+)
 
 def normalize_bullets(text: str) -> str:
     """Normalize irregular or corrupted unicode bullet points to standard bullet."""
@@ -84,7 +90,7 @@ def extract_pdf_layout(pdf_path: str) -> tuple[str, dict]:
     
     return clean_text(full_text), layout_features
 
-def parse_project_blocks(proj_text: str, found_skills: set) -> list:
+def parse_project_blocks(proj_text: str, found_skills: set, candidate_name: str = "") -> list:
     """
     Universal multi-strategy project parser.
     Identifies project headers, groups bullet points, heals line breaks, and attaches localized technologies.
@@ -101,9 +107,19 @@ def parse_project_blocks(proj_text: str, found_skills: set) -> list:
     current_proj = None
     
     for line in raw_lines:
+        clean_l = clean_item_title(line)
+        if not clean_l or len(clean_l) < 3:
+            continue
+            
+        # Ignore lines matching candidate name or education degrees/institutions
+        if candidate_name and candidate_name.lower() in clean_l.lower() and len(clean_l) < len(candidate_name) + 10:
+            continue
+        if NON_PROJECT_KEYWORDS.match(clean_l):
+            continue
+            
         # Check if line contains a project header with glued description (e.g. "Neural Network... | Python... . Built and compared...")
         m = re.search(r'([A-Z0-9][\w\s\–\—\-\:\(\)]+?\s*[\|\–\—]\s*(?:Python|React|Node|SQL|TensorFlow|PyTorch|Scikit|OpenCV|XGBoost|Streamlit|MediaPipe|Experta|Pygame|Surprise|Matplotlib|Seaborn|Java|C#|C\+\+|AWS|Docker|Git)[\w\s\,\.\+\#\-\/]*?)[\.\:]\s+([A-Z][a-z]+.*)', line)
-        if m and not ACTION_VERB_PATTERNS.match(line):
+        if m and not ACTION_VERB_PATTERNS.match(clean_l):
             if current_proj:
                 project_blocks.append(current_proj)
             current_proj = {
@@ -114,15 +130,14 @@ def parse_project_blocks(proj_text: str, found_skills: set) -> list:
             
         # Check if line is a project header
         is_header = False
-        clean_l = clean_item_title(line)
         
-        # Check Delimited Header Pattern (e.g. "Hybrid Movie Recommendation System | Python, Scikit-learn, Surprise, Streamlit")
+        # Delimited Header Pattern (e.g. "Hybrid Movie Recommendation System | Python, Scikit-learn, Surprise, Streamlit")
         if ('|' in line or ' — ' in line or ' – ' in line) and any(t.lower() in line.lower() for t in KNOWN_TECH_KEYWORDS):
             if not ACTION_VERB_PATTERNS.match(clean_l) and not line.startswith(('•', '-', '*')):
                 is_header = True
         elif not ACTION_VERB_PATTERNS.match(clean_l) and not line.startswith(('•', '-', '*')) and len(clean_l) < 70:
             # Standalone project title line (e.g. "MindCare AI - Emotion Detection" or "Connect 4 Hand Gesture Game")
-            if any(k in clean_l.lower() for k in ["system", "pipeline", "classifier", "model comparison", "ai game", "app", "platform", "detector", "detection", "predictor", "prediction", "dashboard", "engine", "network", "analysis"]):
+            if any(k in clean_l.lower() for k in ["system", "pipeline", "classifier", "model comparison", "ai game", "app", "platform", "detector", "detection", "predictor", "prediction", "dashboard", "engine", "network", "analysis", "microservices", "e-commerce"]):
                 is_header = True
                 
         if is_header:
@@ -150,11 +165,17 @@ def parse_project_blocks(proj_text: str, found_skills: set) -> list:
     for p in project_blocks:
         header = p['raw_header']
         
+        # Discard invalid project headers (candidate name, degree, etc.)
+        if candidate_name and candidate_name.lower() in header.lower() and len(header) < len(candidate_name) + 10:
+            continue
+        if NON_PROJECT_KEYWORDS.match(header):
+            continue
+            
         # Parse title and tech strings
         parts = re.split(r'[\s]*[\|\–\—]+[\s]*', header)
         if len(parts) > 1:
             title = parts[0].strip()
-            if len(parts) > 2 and not any(k.lower() in parts[1].lower() for k in ["python", "react", "node", "sql", "tensorflow", "scikit", "pytorch"]):
+            if len(parts) > 2 and not any(k.lower() in parts[1].lower() for k in ["python", "react", "node", "sql", "tensorflow", "scikit", "pytorch", "opencv"]):
                 title = f"{parts[0].strip()} — {parts[1].strip()}"
                 tech_str = parts[2].strip()
             else:
@@ -164,7 +185,7 @@ def parse_project_blocks(proj_text: str, found_skills: set) -> list:
             tech_str = ''
             
         norm_key = re.sub(r'[^a-zA-Z0-9]', '', title.lower())
-        if not norm_key or norm_key in seen_titles:
+        if not norm_key or norm_key in seen_titles or len(norm_key) < 3:
             continue
         seen_titles.add(norm_key)
         
@@ -172,7 +193,7 @@ def parse_project_blocks(proj_text: str, found_skills: set) -> list:
         techs = []
         if tech_str:
             for t in re.split(r'[\,\•\/]+', tech_str):
-                t_clean = t.strip(' .;')
+                t_clean = t.strip(' .;()')
                 if t_clean and len(t_clean) > 1 and t_clean not in techs:
                     techs.append(t_clean)
                     
@@ -239,13 +260,14 @@ def parse_certifications(cert_text: str) -> list:
     cleaned_certs = []
     seen_keys = set()
     
-    HEADER_IGNORE = {"certifications", "certificates", "courses", "training", "accreditations", "licenses", "skills", "soft skills", "activities"}
+    HEADER_IGNORE = {"certifications", "certificates", "courses", "training", "accreditations", "licenses", "skills", "soft skills", "activities", "licenses & certifications", "certificates & courses", "training & courses", "training & workshops", "relevant coursework", "credentials"}
     
     for line in lines:
         clean = line.strip()
         lower = clean.lower()
+        lower_stripped = re.sub(r'^[&•\-\*\s]+', '', lower).strip()
         
-        if lower in HEADER_IGNORE or len(clean) < 4:
+        if lower in HEADER_IGNORE or lower_stripped in HEADER_IGNORE or len(clean) < 4:
             continue
             
         if is_soft_skill_line(clean):
@@ -260,6 +282,12 @@ def parse_certifications(cert_text: str) -> list:
         elif "qcourse" in lower:
             title = clean
             issuer = "QWorld / Quantum Computing Initiative"
+        elif "deeplearning.ai" in lower or "coursera" in lower:
+            title = clean
+            issuer = "DeepLearning.AI / Coursera"
+        elif "aws certified" in lower:
+            title = clean
+            issuer = "Amazon Web Services (AWS)"
         elif re.search(r'[\s]*[-–—|:\u2013\u2014]+[\s]*', clean):
             parts = [p.strip() for p in re.split(r'[\s]*[-–—|:\u2013\u2014]+[\s]*', clean, maxsplit=1)]
             title = parts[0]
@@ -286,7 +314,7 @@ def parse_certifications(cert_text: str) -> list:
 def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
     """
     Complete deterministic profile extraction pipeline for a resume PDF.
-    Returns structured candidate profile adhering strictly to grounded evidence.
+    Features universal multi-strategy fail-safe mechanisms for any CV template.
     """
     cleaned_text, layout_features = extract_pdf_layout(pdf_path)
     sections = split_into_sections(cleaned_text)
@@ -319,12 +347,14 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
         profile["identity"]["phone"] = phone_match.group(0)
         
     first_lines = [l.strip() for l in header_chunk.splitlines() if l.strip()]
+    candidate_name = ""
     if first_lines:
-        candidate_name = first_lines[0]
-        if not re.search(r'[@\d]', candidate_name) and len(candidate_name) < 40:
-            profile["identity"]["name"] = candidate_name
+        c_cand = clean_item_title(first_lines[0])
+        if not re.search(r'[@\d]', c_cand) and len(c_cand) < 40 and not NON_PROJECT_KEYWORDS.match(c_cand):
+            profile["identity"]["name"] = c_cand
+            candidate_name = c_cand
             
-    # 2. Extract Technical Skills (Ontology Regex + GLiNER)
+    # 2. Extract Technical Skills (Ontology Regex across FULL document + GLiNER)
     found_skills = set()
     skill_evidence = {}
     text_lower = cleaned_text.lower()
@@ -338,15 +368,15 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
             end = min(len(cleaned_text), match.end() + 25)
             skill_evidence[canonical] = cleaned_text[start:end].replace('\n', ' ').strip()
             
-    skills_text = sections.get("SKILLS", "")
-    if skills_text.strip():
-        ner_skills = extract_entities_from_chunk(skills_text, ["skill", "technology", "programming language"], threshold=0.3)
-        for item in ner_skills:
-            norm = normalize_skill(item["text"])
-            if norm and norm not in found_skills:
-                found_skills.add(norm)
-                skill_evidence[norm] = item["text"]
-                
+    # Also check skills section with GLiNER
+    skills_text = sections.get("SKILLS", "") or cleaned_text
+    ner_skills = extract_entities_from_chunk(skills_text[:1500], ["skill", "technology", "programming language"], threshold=0.3)
+    for item in ner_skills:
+        norm = normalize_skill(item["text"])
+        if norm and norm not in found_skills:
+            found_skills.add(norm)
+            skill_evidence[norm] = item["text"]
+            
     for s in sorted(list(found_skills)):
         profile["skills"].append({
             "name": s,
@@ -402,45 +432,59 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
                     "confidence": 0.70
                 })
                 
-    # 4. Extract Education
-    edu_text = sections.get("EDUCATION", "")
-    if edu_text.strip():
-        ner_edu = extract_entities_from_chunk(edu_text, ["degree", "university", "college", "school"], threshold=0.35)
-        degrees = [e["text"] for e in ner_edu if e["label"] == "degree"]
-        schools = [e["text"] for e in ner_edu if e["label"] in ["university", "college", "school"]]
-        
-        if degrees or schools:
-            deg = degrees[0] if degrees else "Bachelor of Computer Science"
-            inst = schools[0] if schools else "Alexandria National University"
+    # 4. Extract Education (With Fallback Global Search)
+    edu_text = sections.get("EDUCATION", "") or cleaned_text
+    ner_edu = extract_entities_from_chunk(edu_text[:2000], ["degree", "university", "college", "school"], threshold=0.35)
+    degrees = [e["text"] for e in ner_edu if e["label"] == "degree"]
+    schools = [e["text"] for e in ner_edu if e["label"] in ["university", "college", "school"]]
+    
+    if degrees or schools:
+        deg = degrees[0] if degrees else "Bachelor of Computer Science"
+        inst = schools[0] if schools else "University / Institution"
+        profile["education"].append({
+            "institution": inst,
+            "degree": deg,
+            "field": "Computer Science / Technical",
+            "start_date": "UNKNOWN",
+            "end_date": "UNKNOWN",
+            "evidence": f"{deg} at {inst}",
+            "confidence": 0.85
+        })
+    else:
+        # Regex search for university keywords across document
+        univ_match = re.search(r'([A-Z][a-zA-Z\s]+(?:University|College|Institute|Faculty|Academy))\b', cleaned_text)
+        deg_match = re.search(r'((?:Bachelor|Master|B\.Sc|M\.Sc|Ph\.D|Diploma|Associate)[\s\w\/]+)\b', cleaned_text)
+        if univ_match or deg_match:
+            inst_str = univ_match.group(1).strip() if univ_match else "University / Technical College"
+            deg_str = deg_match.group(1).strip() if deg_match else "Bachelor's Degree"
             profile["education"].append({
-                "institution": inst,
-                "degree": deg,
+                "institution": inst_str,
+                "degree": deg_str,
                 "field": "Computer Science / Technical",
                 "start_date": "UNKNOWN",
                 "end_date": "UNKNOWN",
-                "evidence": f"{deg} at {inst}",
-                "confidence": 0.85
+                "evidence": f"{deg_str} at {inst_str}",
+                "confidence": 0.80
             })
-        else:
-            edu_lines = [l.strip() for l in edu_text.splitlines() if len(l.strip()) > 4]
-            if edu_lines:
-                profile["education"].append({
-                    "institution": edu_lines[0],
-                    "degree": edu_lines[1] if len(edu_lines) > 1 else "Degree",
-                    "field": "Computer Science / Technical",
-                    "start_date": "UNKNOWN",
-                    "end_date": "UNKNOWN",
-                    "evidence": edu_lines[0],
-                    "confidence": 0.80
-                })
             
-    # 5. Extract Projects (Universal Multi-Strategy Block Parsing)
+    # 5. Extract Projects (Universal Multi-Strategy Block Parsing + Fallback)
     proj_text = sections.get("PROJECTS", "")
-    profile["projects"] = parse_project_blocks(proj_text, found_skills)
+    parsed_projects = parse_project_blocks(proj_text, found_skills, candidate_name)
+    
+    # Fail-safe: if section splitting didn't isolate PROJECTS, scan full cleaned_text
+    if not parsed_projects:
+        parsed_projects = parse_project_blocks(cleaned_text, found_skills, candidate_name)
         
-    # 6. Extract Certifications (High-Precision Filtering)
+    profile["projects"] = parsed_projects
+        
+    # 6. Extract Certifications (High-Precision Filtering + Fallback)
     cert_text = sections.get("CERTIFICATIONS", "")
-    profile["certifications"] = parse_certifications(cert_text)
+    parsed_certs = parse_certifications(cert_text)
+    
+    if not parsed_certs and cert_text:
+        parsed_certs = parse_certifications(cleaned_text)
+        
+    profile["certifications"] = parsed_certs
             
     # 7. Extract Languages
     lang_text = sections.get("LANGUAGES", "")

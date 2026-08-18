@@ -60,9 +60,9 @@ export default function ProfileCard() {
     if (!Array.isArray(arr)) return [];
     return arr.filter(item => {
       if (typeof item === 'string') return item !== "UNKNOWN" && item.trim().length > 0;
-      if (typeof item === 'object') {
-        if (item.name === "UNKNOWN" || item.job_title === "UNKNOWN" || item.institution === "UNKNOWN") return false;
-        if (item.evidence === "NOT_FOUND" || item.evidence === "UNKNOWN") return false;
+      if (typeof item === 'object' && item !== null) {
+        const title = item.name || item.job_title || item.institution || item.language;
+        if (!title || title === "UNKNOWN" || title === "NOT_FOUND") return false;
         return true;
       }
       return false;

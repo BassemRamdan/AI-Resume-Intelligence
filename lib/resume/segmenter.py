@@ -2,22 +2,23 @@
 Heuristic Section Segmentation Module.
 Segments cleaned resume text into functional blocks:
 SKILLS, SOFT_SKILLS, EXPERIENCE, EDUCATION, PROJECTS, CERTIFICATIONS, LANGUAGES, ACTIVITIES, SUMMARY.
+Features prioritized multi-word heading patterns.
 """
 
 import re
 
 SECTION_PATTERNS = {
-    "SUMMARY": r'(?:^|\n)(?:\d+\.\s*)?(?:professional\s+summary|summary|profile|about\s+me|career\s+objective|objective)\b[:\s]*',
-    "SKILLS": r'(?:^|\n)(?:\d+\.\s*)?(?:technical\s+|core\s+)?(?:skills|technologies|proficiencies|tech\s+stack|competencies|expertise|tools\s+&\s+technologies)\b[:\s]*',
-    "SOFT_SKILLS": r'(?:^|\n)(?:\d+\.\s*)?(?:soft\s+|interpersonal\s+|personal\s+)?(?:skills|competencies|qualities|attributes|personal\s+traits)\b[:\s]*',
-    "EXPERIENCE": r'(?:^|\n)(?:\d+\.\s*)?(?:work\s+|professional\s+|employment\s+)?(?:experience|history|employment|work\s+history|career\s+history)\b[:\s]*',
-    "EDUCATION": r'(?:^|\n)(?:\d+\.\s*)?(?:education|academic\s+background|qualifications|academic\s+history)\b[:\s]*',
-    "PROJECTS": r'(?:^|\n)(?:\d+\.\s*)?(?:key\s+|technical\s+|academic\s+|personal\s+)?(?:projects|portfolio|open\s+source|work\s+samples)\b[:\s]*',
-    "CERTIFICATIONS": r'(?:^|\n)(?:\d+\.\s*)?(?:certifications|certificates|licenses|accreditations|certificates\s*&\s*courses)\b[:\s]*',
-    "COURSES": r'(?:^|\n)(?:\d+\.\s*)?(?:courses|training|workshops|bootcamps)\b[:\s]*',
-    "LANGUAGES": r'(?:^|\n)(?:\d+\.\s*)?(?:languages|language\s+proficiency|language\s+skills)\b[:\s]*',
-    "ACTIVITIES": r'(?:^|\n)(?:\d+\.\s*)?(?:activities|extracurricular|volunteering|community|honors|awards|achievements)\b[:\s]*',
-    "CONTACT": r'(?:^|\n)(?:\d+\.\s*)?(?:contact\s+info|contact\s+information|contact|personal\s+details|personal\s+info|location)\b[:\s]*'
+    "SUMMARY": r'(?:^|\n)(?:\d+\.\s*)?(?:professional\s+summary|executive\s+summary|career\s+objective|about\s+me|summary|profile|objective)\b[:\s]*',
+    "SKILLS": r'(?:^|\n)(?:\d+\.\s*)?(?:technical\s+proficiencies|technical\s+expertise|tools\s+&\s+technologies|programming\s+languages|languages\s+&\s+frameworks|areas\s+of\s+expertise|technical\s+skills|core\s+competencies|key\s+skills|tech\s+stack|proficiencies|technologies|competencies|expertise|toolkit|skills|tools)\b[:\s]*',
+    "SOFT_SKILLS": r'(?:^|\n)(?:\d+\.\s*)?(?:interpersonal\s+skills|personal\s+traits|soft\s+skills|competencies|qualities|attributes)\b[:\s]*',
+    "EXPERIENCE": r'(?:^|\n)(?:\d+\.\s*)?(?:professional\s+experience|employment\s+history|career\s+history|work\s+experience|relevant\s+experience|industry\s+experience|work\s+history|experience|employment|internships|background)\b[:\s]*',
+    "EDUCATION": r'(?:^|\n)(?:\d+\.\s*)?(?:academic\s+qualifications|academic\s+background|education\s+&\s+training|academic\s+history|academic\s+record|qualifications|education|degrees)\b[:\s]*',
+    "PROJECTS": r'(?:^|\n)(?:\d+\.\s*)?(?:portfolio\s+&\s+production\s+projects|portfolio\s+&\s+projects|technical\s+projects|practical\s+projects|academic\s+projects|personal\s+projects|selected\s+projects|featured\s+projects|software\s+projects|key\s+projects|project\s+experience|open\s+source|work\s+samples|portfolio|projects)\b[:\s]*',
+    "CERTIFICATIONS": r'(?:^|\n)(?:\d+\.\s*)?(?:licenses\s*&\s*certifications|certificates\s*&\s*courses|certificates\s*&\s*training|professional\s+certifications|licenses\s*&\s*credentials|training\s*&\s*courses|certifications|certificates|licenses|accreditations|credentials)\b[:\s]*',
+    "COURSES": r'(?:^|\n)(?:\d+\.\s*)?(?:relevant\s+coursework|training\s*&\s*workshops|courses|training|workshops|bootcamps|coursework)\b[:\s]*',
+    "LANGUAGES": r'(?:^|\n)(?:\d+\.\s*)?(?:language\s+proficiency|language\s+skills|languages)\b[:\s]*',
+    "ACTIVITIES": r'(?:^|\n)(?:\d+\.\s*)?(?:extracurricular\s+activities|volunteering\s+&\s+leadership|honors\s*&\s*awards|activities|extracurricular|volunteering|community|honors|awards|achievements|leadership)\b[:\s]*',
+    "CONTACT": r'(?:^|\n)(?:\d+\.\s*)?(?:contact\s+information|personal\s+details|personal\s+info|contact\s+info|contact|location)\b[:\s]*'
 }
 
 def clean_text(text: str) -> str:
@@ -55,6 +56,7 @@ def split_into_sections(text: str) -> dict:
         sections["EXPERIENCE"] = cleaned
         sections["EDUCATION"] = cleaned
         sections["PROJECTS"] = cleaned
+        sections["CERTIFICATIONS"] = cleaned
         return sections
         
     # Text before first header
