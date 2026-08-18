@@ -53,6 +53,7 @@ KNOWLEDGE & EVIDENCE GROUNDING
 LANGUAGE & FORMATTING RULES
 ==================================================
 - STRICT 100% ENGLISH: Output all responses in clear, articulate, professional English.
+- PURE MARKDOWN ONLY: NEVER output raw HTML tags (do NOT output <br>, <br/>, <p>, <span>, <div>, or &nbsp;). Use standard Markdown newlines and Markdown bullet lists (`- `) instead.
 - FORMATTING: Use clean GitHub Markdown:
   * Section Headers (`###`, `####`)
   * Bold highlights for key terms (`**Term**`)

@@ -3,13 +3,51 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { CheckCircle2, Circle, Copy, Check, Terminal, Sparkles, ArrowRight } from "lucide-react";
+import { CheckCircle2, Circle, Copy, Check, Terminal, Sparkles } from "lucide-react";
 
 interface MarkdownMessageProps {
   content: string;
 }
 
+/**
+ * Sanitizes markdown string from leaking raw HTML tags (<br>, <span>, etc.)
+ * and irregular unicode non-breaking characters.
+ */
+function sanitizeMarkdown(rawText: string): string {
+  if (!rawText) return "";
+
+  let text = rawText;
+
+  // 1. Replace unicode non-breaking hyphens, soft hyphens, and irregular spaces
+  text = text.replace(/[\u200B-\u200D\uFEFF\u202F\u00A0]/g, " ");
+  text = text.replace(/[\u2010\u2011\u00AD]/g, "-");
+
+  // 2. Handle <br> inside markdown table cells (replace with a space or bullet delimiter)
+  // Markdown tables break on standard newlines, so we replace with bullet or comma
+  text = text.replace(/(\|[^\n|]+)<br\s*\/?>([^\n|]+\|)/gi, "$1 • $2");
+  text = text.replace(/<br\s*\/?>\s*[✔️•\-\*]?\s*/gi, "\n\n- ");
+
+  // 3. Clean remaining standalone <br> or <br/>
+  text = text.replace(/<br\s*\/?>/gi, "\n");
+
+  // 4. Strip out leaking HTML tags that shouldn't appear as raw text
+  text = text.replace(/<\/?(?:span|div|p|strong|em|b|i|font|small|u|section|article)[^>]*>/gi, "");
+
+  // 5. Decode common HTML entities
+  text = text.replace(/&nbsp;/gi, " ");
+  text = text.replace(/&amp;/gi, "&");
+  text = text.replace(/&lt;/gi, "<");
+  text = text.replace(/&gt;/gi, ">");
+  text = text.replace(/&quot;/gi, '"');
+  text = text.replace(/&#39;/gi, "'");
+  text = text.replace(/&#8209;/gi, "-");
+
+  return text;
+}
+
 export default function MarkdownMessage({ content }: MarkdownMessageProps) {
+  const sanitizedContent = sanitizeMarkdown(content);
+
   return (
     <div className="markdown-content text-slate-200 space-y-3 leading-relaxed text-sm">
       <ReactMarkdown
@@ -62,7 +100,7 @@ export default function MarkdownMessage({ content }: MarkdownMessageProps) {
             <th className="py-2.5 px-3.5 font-bold" {...props} />
           ),
           td: ({ node, ...props }) => (
-            <td className="py-2 px-3.5 text-slate-300 align-top" {...props} />
+            <td className="py-2.5 px-3.5 text-slate-300 align-top leading-relaxed" {...props} />
           ),
           hr: ({ node, ...props }) => (
             <hr className="border-t border-slate-800/80 my-3.5" {...props} />
@@ -97,7 +135,7 @@ export default function MarkdownMessage({ content }: MarkdownMessageProps) {
           }
         }}
       >
-        {content}
+        {sanitizedContent}
       </ReactMarkdown>
     </div>
   );
@@ -120,7 +158,7 @@ function CodeBlock({ code }: { code: string }) {
         </span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+          className="flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700"
         >
           {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
           <span>{copied ? "Copied" : "Copy"}</span>
