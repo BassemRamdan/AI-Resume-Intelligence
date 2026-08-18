@@ -2,7 +2,7 @@
 Resume Extractor Pipeline.
 Combines PyMuPDF Computer Vision layout parsing, section segmentation,
 GLiNER NER entity extraction, and Skill Ontology normalization.
-Features high-precision block parsing for Projects, Certifications, Education, and Experience.
+Features universal multi-strategy block parsing for Projects, Certifications, Education, and Experience.
 """
 
 import os
@@ -13,7 +13,7 @@ from .segmenter import clean_text, split_into_sections
 from .gliner import extract_entities_from_chunk
 
 ACTION_VERB_PATTERNS = re.compile(
-    r'^(?:built|developed|implemented|integrated|improved|designed|created|trained|applied|evaluated|conducted|generated|managed|configured|led|engineered|tested|deployed|architected|optimized|analyzed|collaborated|researched|maintained|spearheaded|utilized|connected)\b',
+    r'^(?:built|designed|paired|trained|benchmarked|developed|implemented|integrated|deployed|evaluated|incorporated|created|applied|conducted|generated|managed|configured|led|engineered|tested|architected|optimized|analyzed|collaborated|researched|maintained|spearheaded|utilized|connected|performed|structured|produced|authored|delivered)\b',
     re.IGNORECASE
 )
 
@@ -22,8 +22,16 @@ SOFT_SKILLS_SET = {
     "adaptability", "fast learner", "learner", "leadership", "work ethic", "self-motivated",
     "creativity", "attention to detail", "critical thinking", "collaboration", "multitasking",
     "interpersonal skills", "presentation skills", "negotiation", "conflict resolution", "fast",
-    "problem", "solving", "time", "management"
+    "problem", "solving", "time", "management", "analytical"
 }
+
+KNOWN_TECH_KEYWORDS = [
+    "Python", "React", "Node.js", "SQL", "TensorFlow", "PyTorch", "Scikit-learn", "Scikit", 
+    "OpenCV", "XGBoost", "Streamlit", "MediaPipe", "Experta", "Pygame", "Surprise", 
+    "Matplotlib", "Seaborn", "NLP", "FastAPI", "Docker", "Flask", "Django", "JavaScript", 
+    "TypeScript", "C#", "C++", "Java", "AWS", "Git", "Database Design", "RESTful APIs",
+    "EDA", "PCA", "SVD", "K-Medoids", "Minimax", "CNN", "FFNN", "MLP"
+]
 
 def normalize_bullets(text: str) -> str:
     """Normalize irregular or corrupted unicode bullet points to standard bullet."""
@@ -78,101 +86,147 @@ def extract_pdf_layout(pdf_path: str) -> tuple[str, dict]:
 
 def parse_project_blocks(proj_text: str, found_skills: set) -> list:
     """
-    Parses project sections into coherent multi-line project units.
-    Groups title lines with their subsequent bullet points and extracts localized technologies.
+    Universal multi-strategy project parser.
+    Identifies project headers, groups bullet points, heals line breaks, and attaches localized technologies.
     """
     if not proj_text.strip():
         return []
         
-    lines = [l.strip() for l in proj_text.splitlines() if l.strip()]
-    if not lines:
+    text = normalize_bullets(proj_text)
+    raw_lines = [l.strip() for l in text.splitlines() if l.strip()]
+    if not raw_lines:
         return []
         
-    projects = []
-    current_project = None
+    project_blocks = []
+    current_proj = None
     
-    def is_title_line(line: str) -> bool:
-        clean = clean_item_title(line)
-        if not clean or len(clean) < 3 or len(clean) > 85:
-            return False
-        # If clean line starts with an action verb, it is ALWAYS a bullet description
-        if ACTION_VERB_PATTERNS.match(clean):
-            return False
-        return True
-        
-    for line in lines:
-        if is_title_line(line):
-            # Save previous project
-            if current_project:
-                projects.append(current_project)
+    for line in raw_lines:
+        # Check if line contains a project header with glued description (e.g. "Neural Network... | Python... . Built and compared...")
+        m = re.search(r'([A-Z0-9][\w\s\–\—\-\:\(\)]+?\s*[\|\–\—]\s*(?:Python|React|Node|SQL|TensorFlow|PyTorch|Scikit|OpenCV|XGBoost|Streamlit|MediaPipe|Experta|Pygame|Surprise|Matplotlib|Seaborn|Java|C#|C\+\+|AWS|Docker|Git)[\w\s\,\.\+\#\-\/]*?)[\.\:]\s+([A-Z][a-z]+.*)', line)
+        if m and not ACTION_VERB_PATTERNS.match(line):
+            if current_proj:
+                project_blocks.append(current_proj)
+            current_proj = {
+                'raw_header': m.group(1).strip(),
+                'lines': [m.group(2).strip()]
+            }
+            continue
             
-            clean_title = clean_item_title(line)
-            current_project = {
-                "raw_title": clean_title,
-                "bullet_points": [],
-                "full_text": line
+        # Check if line is a project header
+        is_header = False
+        clean_l = clean_item_title(line)
+        
+        # Check Delimited Header Pattern (e.g. "Hybrid Movie Recommendation System | Python, Scikit-learn, Surprise, Streamlit")
+        if ('|' in line or ' — ' in line or ' – ' in line) and any(t.lower() in line.lower() for t in KNOWN_TECH_KEYWORDS):
+            if not ACTION_VERB_PATTERNS.match(clean_l) and not line.startswith(('•', '-', '*')):
+                is_header = True
+        elif not ACTION_VERB_PATTERNS.match(clean_l) and not line.startswith(('•', '-', '*')) and len(clean_l) < 70:
+            # Standalone project title line (e.g. "MindCare AI - Emotion Detection" or "Connect 4 Hand Gesture Game")
+            if any(k in clean_l.lower() for k in ["system", "pipeline", "classifier", "model comparison", "ai game", "app", "platform", "detector", "detection", "predictor", "prediction", "dashboard", "engine", "network", "analysis"]):
+                is_header = True
+                
+        if is_header:
+            if current_proj:
+                project_blocks.append(current_proj)
+            current_proj = {
+                'raw_header': clean_l,
+                'lines': []
             }
         else:
-            clean_bullet = clean_item_title(line)
-            if current_project:
-                if clean_bullet:
-                    current_project["bullet_points"].append(clean_bullet)
-                    current_project["full_text"] += " " + line
+            if current_proj:
+                current_proj['lines'].append(line)
             else:
-                # If first lines are orphaned, start initial project
-                current_project = {
-                    "raw_title": clean_bullet or "Technical Portfolio Project",
-                    "bullet_points": [],
-                    "full_text": line
+                current_proj = {
+                    'raw_header': clean_l,
+                    'lines': []
                 }
                 
-    if current_project:
-        projects.append(current_project)
+    if current_proj:
+        project_blocks.append(current_proj)
         
-    # Format and localize technologies for each project
-    formatted_projects = []
+    final_projects = []
     seen_titles = set()
     
-    for p in projects:
-        raw_title = p["raw_title"]
-        norm_key = re.sub(r'[^a-zA-Z0-9]', '', raw_title.lower())
+    for p in project_blocks:
+        header = p['raw_header']
+        
+        # Parse title and tech strings
+        parts = re.split(r'[\s]*[\|\–\—]+[\s]*', header)
+        if len(parts) > 1:
+            title = parts[0].strip()
+            if len(parts) > 2 and not any(k.lower() in parts[1].lower() for k in ["python", "react", "node", "sql", "tensorflow", "scikit", "pytorch"]):
+                title = f"{parts[0].strip()} — {parts[1].strip()}"
+                tech_str = parts[2].strip()
+            else:
+                tech_str = parts[1].strip()
+        else:
+            title = header
+            tech_str = ''
+            
+        norm_key = re.sub(r'[^a-zA-Z0-9]', '', title.lower())
         if not norm_key or norm_key in seen_titles:
             continue
         seen_titles.add(norm_key)
         
-        # Localized technologies: find skills that appear in THIS project's text
-        proj_corpus = p["full_text"].lower()
-        local_techs = []
-        for s in found_skills:
-            if s.lower() in proj_corpus:
-                if s not in local_techs:
-                    local_techs.append(s)
+        # Extract explicit technologies from header
+        techs = []
+        if tech_str:
+            for t in re.split(r'[\,\•\/]+', tech_str):
+                t_clean = t.strip(' .;')
+                if t_clean and len(t_clean) > 1 and t_clean not in techs:
+                    techs.append(t_clean)
                     
-        # Check additional common tech keywords in this project
-        for k in ["Python", "Machine Learning", "Streamlit", "SQL", "React", "Node.js", "Express", "NLP", "FastAPI", "Docker", "Database Design", "RESTful APIs"]:
-            if k.lower() in proj_corpus and k not in local_techs:
-                local_techs.append(k)
+        # Reconstruct body sentences and heal line breaks
+        raw_body_lines = p['lines']
+        reconstructed_sentences = []
+        current_sentence = ''
+        
+        for bline in raw_body_lines:
+            clean_b = re.sub(r'^[•\-\*\s]+', '', bline).strip()
+            if not clean_b:
+                continue
                 
-        # Build description from bullet points
-        bullets = p["bullet_points"]
-        if bullets:
-            desc = ". ".join(bullets)
-            if not desc.endswith("."):
-                desc += "."
-        else:
-            desc = "Technical project developed as part of engineering portfolio."
+            starts_new_bullet = bool(bline.startswith(('•', '-', '*')) or ACTION_VERB_PATTERNS.match(clean_b))
             
-        formatted_projects.append({
-            "name": raw_title,
-            "description": desc,
-            "technologies": local_techs[:6],
-            "role": "Developer / Contributor",
-            "links": [],
-            "evidence": raw_title,
-            "confidence": 0.90
+            if starts_new_bullet:
+                if current_sentence:
+                    reconstructed_sentences.append(current_sentence.strip())
+                current_sentence = clean_b
+            else:
+                if current_sentence:
+                    if current_sentence.endswith('.'):
+                        current_sentence = current_sentence[:-1] + ' ' + clean_b
+                    elif current_sentence.endswith('-'):
+                        current_sentence = current_sentence[:-1] + clean_b
+                    else:
+                        current_sentence += ' ' + clean_b
+                else:
+                    current_sentence = clean_b
+                    
+        if current_sentence:
+            reconstructed_sentences.append(current_sentence.strip())
+            
+        # Also discover any additional localized technologies from project body
+        full_proj_text = header + " " + " ".join(raw_body_lines)
+        for s in found_skills:
+            if s.lower() in full_proj_text.lower() and s not in techs:
+                techs.append(s)
+                
+        desc = ' '.join(reconstructed_sentences)
+        if not desc:
+            desc = 'Technical project developed as part of engineering portfolio.'
+            
+        final_projects.append({
+            'name': title,
+            'technologies': techs[:6],
+            'description': desc,
+            'role': 'Developer / Contributor',
+            'links': [],
+            'evidence': title,
+            'confidence': 0.95
         })
         
-    return formatted_projects
+    return final_projects
 
 def parse_certifications(cert_text: str) -> list:
     """
@@ -191,19 +245,15 @@ def parse_certifications(cert_text: str) -> list:
         clean = line.strip()
         lower = clean.lower()
         
-        # Skip section headers
         if lower in HEADER_IGNORE or len(clean) < 4:
             continue
             
-        # Skip soft skills
         if is_soft_skill_line(clean):
             continue
             
-        # Skip candidate names, locations, contact snippets
         if re.search(r'^(?:cairo|alexandria|giza|egypt|remote|phone|email)\b', lower):
             continue
             
-        # Determine Title vs Issuer
         if "digital egypt pioneers" in lower or "depi" in lower:
             title = clean
             issuer = "Ministry of Communications (MCIT) / DEPI"
@@ -384,7 +434,7 @@ def extract_resume(pdf_path: str, classifier_fn = None) -> dict:
                     "confidence": 0.80
                 })
             
-    # 5. Extract Projects (High-Precision Multi-Line Block Parsing)
+    # 5. Extract Projects (Universal Multi-Strategy Block Parsing)
     proj_text = sections.get("PROJECTS", "")
     profile["projects"] = parse_project_blocks(proj_text, found_skills)
         
