@@ -10,37 +10,52 @@ interface MarkdownMessageProps {
 }
 
 /**
- * Sanitizes markdown string from leaking raw HTML tags (<br>, <span>, etc.)
- * and irregular unicode non-breaking characters.
+ * Robust markdown sanitizer that eliminates leaking raw HTML tags (<br>, <span>, etc.),
+ * preserves table syntax, and normalizes irregular unicode characters.
  */
 function sanitizeMarkdown(rawText: string): string {
   if (!rawText) return "";
 
   let text = rawText;
 
-  // 1. Replace unicode non-breaking hyphens, soft hyphens, and irregular spaces
-  text = text.replace(/[\u200B-\u200D\uFEFF\u202F\u00A0]/g, " ");
-  text = text.replace(/[\u2010\u2011\u00AD]/g, "-");
+  // 1. Normalize unicode characters (non-breaking spaces, soft hyphens, non-breaking hyphens)
+  text = text
+    .replace(/[\u200B-\u200D\uFEFF\u202F\u00A0]/g, " ")
+    .replace(/[\u2010\u2011\u00AD]/g, "-");
 
-  // 2. Handle <br> inside markdown table cells (replace with a space or bullet delimiter)
-  // Markdown tables break on standard newlines, so we replace with bullet or comma
-  text = text.replace(/(\|[^\n|]+)<br\s*\/?>([^\n|]+\|)/gi, "$1 • $2");
-  text = text.replace(/<br\s*\/?>\s*[✔️•\-\*]?\s*/gi, "\n\n- ");
+  // 2. Line-by-line processing: safely handle tables vs normal text
+  const lines = text.split("\n");
+  const processedLines = lines.map((line) => {
+    const trimmed = line.trim();
+    // If this line is part of a markdown table (contains table pipes)
+    if (trimmed.startsWith("|") || (line.includes("|") && line.split("|").length > 2)) {
+      return line
+        .replace(/<br\s*\/?>\s*[-•*✔️]?\s*/gi, " • ")
+        .replace(/<br\s*\/?>/gi, " • ")
+        .replace(/<\/?(?:span|div|p|strong|em|b|i|font|small|u)[^>]*>/gi, "");
+    }
+    // Outside tables, replace <br> with clean newlines/bullet points
+    return line
+      .replace(/<br\s*\/?>\s*[-•*✔️]?\s*/gi, "\n- ")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/?(?:span|div|p|strong|em|b|i|font|small|u)[^>]*>/gi, "");
+  });
 
-  // 3. Clean remaining standalone <br> or <br/>
+  text = processedLines.join("\n");
+
+  // 3. Clean any remaining raw HTML tags
   text = text.replace(/<br\s*\/?>/gi, "\n");
-
-  // 4. Strip out leaking HTML tags that shouldn't appear as raw text
   text = text.replace(/<\/?(?:span|div|p|strong|em|b|i|font|small|u|section|article)[^>]*>/gi, "");
 
-  // 5. Decode common HTML entities
-  text = text.replace(/&nbsp;/gi, " ");
-  text = text.replace(/&amp;/gi, "&");
-  text = text.replace(/&lt;/gi, "<");
-  text = text.replace(/&gt;/gi, ">");
-  text = text.replace(/&quot;/gi, '"');
-  text = text.replace(/&#39;/gi, "'");
-  text = text.replace(/&#8209;/gi, "-");
+  // 4. Decode HTML entities
+  text = text
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&#8209;/gi, "-");
 
   return text;
 }
@@ -100,7 +115,7 @@ export default function MarkdownMessage({ content }: MarkdownMessageProps) {
             <th className="py-2.5 px-3.5 font-bold" {...props} />
           ),
           td: ({ node, ...props }) => (
-            <td className="py-2.5 px-3.5 text-slate-300 align-top leading-relaxed" {...props} />
+            <td className="py-2 px-3.5 text-slate-300 align-top leading-relaxed" {...props} />
           ),
           hr: ({ node, ...props }) => (
             <hr className="border-t border-slate-800/80 my-3.5" {...props} />

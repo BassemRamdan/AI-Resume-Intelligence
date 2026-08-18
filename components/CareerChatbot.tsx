@@ -16,8 +16,7 @@ import {
   BrainCircuit,
   Zap,
   Check,
-  Flame,
-  ArrowRight
+  Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MarkdownMessage from "./MarkdownMessage";
@@ -92,7 +91,8 @@ Ask me anything about your technical growth:
   const [messages, setMessages] = useState<ChatMessage[]>([initialGreeting]);
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const latestMessageRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (defaultCareer) {
@@ -100,14 +100,18 @@ Ask me anything about your technical growth:
     }
   }, [defaultCareer]);
 
-  useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
-    }
-  }, [messages, isOpen]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // Scroll to the start of the latest message
+  const scrollToLatestStart = (targetId?: string) => {
+    setTimeout(() => {
+      if (targetId) {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+      }
+      latestMessageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   };
 
   const handleCopyMessage = (id: string, text: string) => {
@@ -116,7 +120,7 @@ Ask me anything about your technical growth:
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleResetChat = () => {
+  const handleClearChat = () => {
     setMessages([initialGreeting]);
   };
 
@@ -135,6 +139,8 @@ Ask me anything about your technical growth:
     setMessages((prev) => [...prev, userMsg]);
     if (!textToSend) setInputMessage("");
     setLoading(true);
+
+    scrollToLatestStart(userMessageId);
 
     try {
       const historyPayload = messages
@@ -164,26 +170,32 @@ Ask me anything about your technical growth:
       }
 
       const data = await response.json();
-      
       const replyContent = data.response || data.reply || data.content || data.message;
       
+      const botMessageId = `bot-${Date.now()}`;
       const botMsg: ChatMessage = {
-        id: `bot-${Date.now()}`,
+        id: botMessageId,
         role: "assistant",
         content: replyContent || "I apologize, but I could not synthesize a roadmap at this moment.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
       setMessages((prev) => [...prev, botMsg]);
+      
+      // Scroll to the TOP of the new bot message so user can read from beginning!
+      scrollToLatestStart(botMessageId);
+
     } catch (err: any) {
       console.error("Chatbot error:", err);
+      const errorMsgId = `bot-err-${Date.now()}`;
       const errorMsg: ChatMessage = {
-        id: `bot-err-${Date.now()}`,
+        id: errorMsgId,
         role: "assistant",
         content: `⚠️ **Advisory Engine Notice:**\nUnable to reach generative AI service. Please ensure that the FastAPI backend or Groq API connection is active.\n*Details: ${err.message || 'Network Timeout'}*`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages((prev) => [...prev, errorMsg]);
+      scrollToLatestStart(errorMsgId);
     } finally {
       setLoading(false);
     }
@@ -262,18 +274,20 @@ Ask me anything about your technical growth:
                 
                 <div className="flex items-center gap-1.5">
                   <button
+                    onClick={handleClearChat}
+                    title="Clear / Delete Chat"
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs text-slate-400 hover:text-rose-400 rounded-xl hover:bg-slate-800/80 transition-colors border border-slate-800 hover:border-rose-900/60"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Clear Chat</span>
+                  </button>
+
+                  <button
                     onClick={() => setIsMaximized(!isMaximized)}
                     title={isMaximized ? "Restore Size" : "Maximize Window"}
                     className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/80 transition-colors"
                   >
                     {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                  </button>
-                  <button
-                    onClick={handleResetChat}
-                    title="Reset Conversation"
-                    className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800/80 transition-colors"
-                  >
-                    <RotateCcw className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
@@ -334,10 +348,11 @@ Ask me anything about your technical growth:
               </div>
 
               {/* Chat Message Stream */}
-              <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-950 bg-grid-cyber">
+              <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-950 bg-grid-cyber">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
+                    id={msg.id}
                     className={`flex gap-3.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     {/* Bot Avatar */}
@@ -433,7 +448,7 @@ Ask me anything about your technical growth:
                   </div>
                 )}
                 
-                <div ref={messagesEndRef} />
+                <div ref={latestMessageRef} />
               </div>
 
               {/* Message Input Box with Modern Glassmorphism */}
